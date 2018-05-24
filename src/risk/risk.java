@@ -1,33 +1,35 @@
 package risk;
 
-import org.newdawn.slick.AppGameContainer;
-import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
+import org.lwjgl.input.Mouse;
+import org.newdawn.slick.*;
 
-public class risk extends BasicGame
+import org.newdawn.slick.state.*;
+
+public class risk extends BasicGameState
 {
-	public risk(String title) {
-		super(title);
-	}
-	public void init(GameContainer arg0) throws SlickException  {
+	public risk(String string) {
 		
 	}
-	public void update(GameContainer arg0, int delta) {
+	public risk(int risk) {
+		// TODO Auto-generated constructor stub
+	}
+	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException  {
 		
 	}
-	public void render(GameContainer arg0, Graphics g) throws SlickException {
-		Image img = new Image("carte.png");
-		g.drawImage(img, 0, 0, 0 ,0, 1253, 795);
-		g.drawString("Hello World", 50,50);
+	public void update(GameContainer gc ,StateBasedGame sbg, int delta) {
+		
+	}
+	public void render(GameContainer gc,StateBasedGame sbg, Graphics g) throws SlickException {
+		
 	}
 	public static void main(String[] args) throws SlickException{
-		AppGameContainer app = new AppGameContainer(new risk("risk"));
+		AppGameContainer app = new AppGameContainer((Game) new risk("risk"));
 		
 		app.setDisplayMode (1253,795,false);
 		app.start();
+	}
+	public int getID() {
+		return 1;
 	}
 }
 
