@@ -23,6 +23,3 @@ public class Territory {
 	}
 	
 }
-
-//Territory France = new Territory(1, {4,5,0,0,0,0});
-//France.setGeoInfo(X,Y,2);

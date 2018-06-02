@@ -17,7 +17,7 @@ public class Game {
 	
 	public void menu(int x, int y) {
 		
-		int tictac = 4000 ;  // en ms. tictac/2 = temps d'affichage de chaque image
+		int tictac = 2000 ;  // en ms. tictac/2 = temps d'affichage de chaque image
 		boolean Menu1 = true; //bouleen pour savoir quel image est affichee en ce moment
 		StdDraw.picture(x/2, y/2, "Menu/Menu1.png");
 
@@ -39,6 +39,7 @@ public class Game {
 		
 		while (!StdDraw.isKeyPressed(32)) {
 			if (StdDraw.isMousePressed()) {	
+				System.out.println(StdDraw.isMousePressed());
 				if (this.isBetween(228.0, 407.0, 366.0, 506.0)) {
 					PlayerCount = 2;
 				}
@@ -60,12 +61,7 @@ public class Game {
 				if (this.isBetween(759.0, 158.0, 1038.0, 281.0)) {
 					ActivateAI = 2;
 				}
-				if (this.isBetween(487.0, 15.0, 805.0, 135.0 )) {
-					if (PlayerCount !=0 && ActivateAI != 0) {
-						
-						//Launch game
-					}
-				}
+				
 				
 				//Affichage Dynamique
 				if (PlayerCount ==0 || ActivateAI == 0) {					
@@ -94,7 +90,13 @@ public class Game {
 					break;
 					
 				}
-				
+				if (this.isBetween(487.0, 15.0, 805.0, 135.0 )) {
+					if (PlayerCount !=0 && ActivateAI != 0) {
+						StdDraw.pause(100);	// isMousePressed n'aime pas quand on lance une methode alors qu'il ne s'est pas encore reset
+						this.launch(PlayerCount, ActivateAI);
+					}
+				}
+				StdDraw.pause(100);
 			}
 		}
 		
@@ -127,7 +129,7 @@ public class Game {
 	
 	public void launch(int PlayerCount, int ActivateAI){
 		
-		
+		this.Plateau.initialize();
 		
 		
 
