@@ -129,7 +129,8 @@ public class Game {
 	
 	public void launch(int PlayerCount, int ActivateAI){
 		
-		this.Plateau.initialize();
+		this.Plateau.initialize(PlayerCount, ActivateAI);
+		
 		
 		
 
