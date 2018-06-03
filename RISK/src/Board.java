@@ -35,6 +35,7 @@ public class Board {
 		this.instanceTerritories();
 		this.attributeTerritories(PlayerCount, ActivateAI);
 		this.instancePlayers(PlayerCount, ActivateAI);
+		this.actualize();
 
 	}
 	
@@ -160,15 +161,55 @@ public class Board {
 				}
 			}
 		}
-		for (int j= 0; j<42;j++){
+		/*for (int j= 0; j<42;j++){
 			System.out.println(territories[j].player);
-		}
+		}*/
 		
 	}
 	
 	public void instancePlayers(int PlayerCount, int ActivateAI) {
 		
+		int i = 1;
+		players[0] = new Player(1,75,209,227);
+		players[1] = new Player(2,0,0,0);
+		players[2] = new Player(3,255,255,255);
+		players[3] = new Player(4,130,130,130);
+		players[4] = new Player(5,169,224,40);
+		players[5] = new Player(6,255,183,135);
 		
+		players[0].alive = true;
+		players[0].AI = false;
+		while(i < PlayerCount) {
+			players[i].alive = true;
+			if(ActivateAI == 1) {
+				players[i].AI = true;
+			}
+			else {
+				players[i].AI = false;
+			}
+			i++;	
+		}
+		
+		//melange
+		int x, y/*, memoryNumber*/;
+		boolean memoryAlive, memoryAI;
+		for (i=0; i<PlayerCount*4;i++) {
+			x= (int )(Math.random() * PlayerCount);
+			y= (int )(Math.random() * PlayerCount);
+			//memoryNumber = players[x].number;
+			memoryAlive = players[x].alive;
+			memoryAI = players[x].AI;
+			//players[x].number = players[y].number;
+			players[x].alive = players[y].alive;
+			players[x].AI = players[y].AI;
+			//players[y].number = memoryNumber;
+			players[y].alive = memoryAlive;
+			players[y].AI = memoryAI;
+		}
+		
+		for (i=0; i<PlayerCount;i++) {
+			System.out.println(players[i].number + " " + players[i].AI+ " " + players[i].alive + " " + players[i].color[0] + " " + players[i].color[1] + " " + players[i].color[2]);
+		}
 		
 	}
 	
@@ -176,9 +217,37 @@ public class Board {
 	
 	
 	public void actualize(){
-
-		StdDraw.setPenColor(StdDraw.MAGENTA);
-		StdDraw.picture(550, 500, "Risk_Map.png");
+		this.writeTerritories();
 		
+		
+	}
+	
+	public void writeTerritories() {
+		StdDraw.enableDoubleBuffering();
+		for (int i=0; i<42;i++) {
+			if (territories[i].player != 0) {
+				StdDraw.setPenColor(255, 255, 255);
+				StdDraw.filledCircle(territories[i].X, territories[i].Y, 20);
+				StdDraw.setPenColor(players[territories[i].player-1].color[0], players[territories[i].player-1].color[1], players[territories[i].player-1].color[2]);// couleur du player controlant le territoire
+				StdDraw.setPenRadius(0.015);
+				StdDraw.circle(territories[i].X, territories[i].Y, 22.5);
+			}
+			else {
+				StdDraw.setPenColor(255, 255, 255);
+				StdDraw.filledCircle(territories[i].X, territories[i].Y, 20);
+				StdDraw.setPenColor(0, 0, 0);
+				//StdDraw.text(0.5, 0.5, (String)0);
+				
+			}
+			StdDraw.show();
+			
+		}
+	}
+	
+	public int powerEstimation(Territory territory) {
+		int x = territory.musketman[0]+territory.musketman[1]+territory.musketman[2];
+		x+= territory.horseman[0]+territory.horseman[1]+territory.horseman[2]+territory.horseman[3];
+		x+= territory.canonnier[0]+territory.canonnier[1];
+		return x;
 	}
 }
