@@ -30,6 +30,15 @@ public class Territory {
 		this.musketman[1]=y;
 		this.musketman[2]=z;
 	}
+	public int getMusketman() {
+		return this.musketman[0]+this.musketman[1]+this.musketman[2];
+	}
+	public int getHorseman() {
+		return this.horseman[0]+this.horseman[1]+this.horseman[2]+this.horseman[3];
+	}
+	public int getCanonnier() {
+		return this.canonnier[0]+this.canonnier[1];
+	}
 	
 	
 }

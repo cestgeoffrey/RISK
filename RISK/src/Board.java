@@ -4,7 +4,8 @@ public class Board {
 	
 	Territory[] territories = new Territory[42];
 	Player[] players = new Player[6];
-	
+	int x = 1361;
+	int y = 675;
 	
 	
 	
@@ -35,7 +36,7 @@ public class Board {
 		this.instanceTerritories();
 		this.attributeTerritories(PlayerCount, ActivateAI);
 		this.instancePlayers(PlayerCount, ActivateAI);
-		this.actualize();
+		this.actualize(4,1,1);
 
 	}
 	
@@ -138,7 +139,7 @@ public class Board {
 		territories[40].player = 0;
 		territories[41].player = 0;
 		
-		//attribution équitable et ordonnées de territoires
+		//attribution équitable et ordonnée de territoires
 		for (int i = 0; i<PlayerCount;i++) {
 			for (int j= 0; j<42/PlayerCount;j++){
 				territories[(i*(42/PlayerCount))+j].player = i+1;
@@ -208,7 +209,7 @@ public class Board {
 		}
 		
 		for (i=0; i<PlayerCount;i++) {
-			System.out.println(players[i].number + " " + players[i].AI+ " " + players[i].alive + " " + players[i].color[0] + " " + players[i].color[1] + " " + players[i].color[2]);
+			//System.out.println(players[i].number + " " + players[i].AI+ " " + players[i].alive + " " + players[i].color[0] + " " + players[i].color[1] + " " + players[i].color[2]);
 		}
 		
 	}
@@ -216,9 +217,11 @@ public class Board {
 	
 	
 	
-	public void actualize(){
+	public void actualize( int panel, int player,int territory){
 		this.writeTerritories();
-		
+		this.writePanel(panel,player,territory);
+		this.writeColoredCube(player);
+		this.writeInRangeTerritories(panel,player,territory);
 		
 	}
 	
@@ -243,8 +246,110 @@ public class Board {
 				
 				
 			}
-			StdDraw.show();
+			//StdDraw.show();
+		}
+		StdDraw.disableDoubleBuffering();
+	}
+	
+	public void writePanel(int panel, int player, int territory) {
+		//panel : voir classe joueur
+		//player : nombre du joueur (pas index)
+		//territory : ID du territoire (pas index aussi)
+		StdDraw.enableDoubleBuffering();
+		switch(panel) {
+		case 0: 
+			StdDraw.picture(this.x/2, this.y/2, "Map/Clear.png");
+			break;
+		case 1:
+			StdDraw.picture(this.x/2, this.y/2, "Map/OPFOR1.png");
+			StdDraw.setPenColor(255,255,255);
+			StdDraw.text(1090.0,435.0,Integer.toString(this.territories[territory-1].getHorseman()));
+			StdDraw.text(1287.0,436.0,Integer.toString(this.territories[territory-1].getCanonnier()));
+			StdDraw.text(1190.0,435.0,Integer.toString(this.territories[territory-1].getMusketman()));
+			break;
+		case 2: 
+			StdDraw.picture(this.x/2, this.y/2, "Map/Reinforcements.png");
+			StdDraw.setPenColor(255,255,255);
+			StdDraw.text(1090.0,435.0,Integer.toString(this.territories[territory-1].getHorseman()));
+			StdDraw.text(1287.0,436.0,Integer.toString(this.territories[territory-1].getCanonnier()));
+			StdDraw.text(1190.0,435.0,Integer.toString(this.territories[territory-1].getMusketman()));
+			StdDraw.text(1089.0,348.0,Integer.toString(this.players[player-1].horseman[0]));
+			StdDraw.text(1190.0,349.0,Integer.toString(this.players[player-1].musketman[0]));
+			StdDraw.text(1287.0,348.0,Integer.toString(this.players[player-1].canonnier));
+			StdDraw.text(1188.0,244.0,Integer.toString(this.players[player-1].reinforcements));
+			break;
+		case 3:
+			StdDraw.picture(this.x/2, this.y/2, "Map/OPFOR2.png");
+			StdDraw.setPenColor(255,255,255);
+			StdDraw.text(1090.0,435.0,Integer.toString(this.territories[territory-1].getHorseman()));
+			StdDraw.text(1287.0,436.0,Integer.toString(this.territories[territory-1].getCanonnier()));
+			StdDraw.text(1190.0,435.0,Integer.toString(this.territories[territory-1].getMusketman()));
+			break;
+		case 4:
+			StdDraw.picture(this.x/2, this.y/2, "Map/Orders.png");
+			StdDraw.setPenColor(255,255,255);
+			StdDraw.text(1088.0,481.0,Integer.toString(this.territories[territory-1].getHorseman()));
+			StdDraw.text(1187.0,481.0,Integer.toString(this.territories[territory-1].getMusketman()));
+			StdDraw.text(1290.0,482.0,Integer.toString(this.territories[territory-1].getCanonnier()));
+			StdDraw.text(1090.0,404.0,Integer.toString(this.territories[territory-1].horseman[3]));
+			StdDraw.text(1190.0,403.0,Integer.toString(this.territories[territory-1].musketman[2]));
+			StdDraw.text(1290.0,403.0,Integer.toString(this.territories[territory-1].canonnier[1]));
+			StdDraw.text(1073.0,324.0,Integer.toString(this.territories[territory-1].horseman[2]));
+			StdDraw.text(1076.0,247.0,Integer.toString(this.territories[territory-1].horseman[1]));
+			StdDraw.text(1077.0,178.0,Integer.toString(this.territories[territory-1].horseman[0]));
+			StdDraw.text(1175.0,321.0,Integer.toString(this.territories[territory-1].musketman[1]));
+			StdDraw.text(1172.0,252.0,Integer.toString(this.territories[territory-1].musketman[0]));
+			StdDraw.text(1273.0,324.0,Integer.toString(this.territories[territory-1].canonnier[0]));
+			if(this.players[player-1].troopsInHand()<=3 && this.players[player-1].troopsInHand()>0) {
+				StdDraw.setPenColor(StdDraw.RED);
+			}
+			if(this.players[player-1].troopsInHand()>3) {
+				StdDraw.setPenColor(StdDraw.GREEN);
+			}
+			StdDraw.text(1109.0,290.0,Integer.toString(this.players[player-1].horseman[2]));
+			StdDraw.text(1109.0,219.0,Integer.toString(this.players[player-1].horseman[1]));
+			StdDraw.text(1109.0,147.0,Integer.toString(this.players[player-1].horseman[0]));
+			StdDraw.text(1208.0,292.0,Integer.toString(this.players[player-1].musketman[1]));
+			StdDraw.text(1208.0,220.0,Integer.toString(this.players[player-1].musketman[0]));
+			StdDraw.text(1304.0,292.0,Integer.toString(this.players[player-1].canonnier));
+			break;
 			
+		}
+		
+		/*StdDraw.show();
+		double X;
+		double Y;
+		while (!StdDraw.isKeyPressed(32)) {
+			
+			if (StdDraw.isMousePressed()) {	
+				
+				X = StdDraw.mouseX();
+				Y = StdDraw.mouseY();
+				System.out.println(X + "," + Y + ",");
+				StdDraw.pause(100);//Pause car isMousePressed reste true pendant qq ms (de trop !)
+			}
+			
+		}*/
+	}
+	
+	public void writeColoredCube(int player) {
+		StdDraw.enableDoubleBuffering();
+		StdDraw.setPenColor(this.players[player-1].color[0],this.players[player-1].color[1],this.players[player-1].color[2]);
+		StdDraw.filledSquare(55.0, 55.0, 40.0);
+	}
+	
+	public void writeInRangeTerritories(int panel, int player, int territory) {
+		if (panel == 4) {
+			StdDraw.enableDoubleBuffering();
+			StdDraw.setPenColor(255,255,255);
+			StdDraw.setPenRadius(0.010);
+			for (int i = 0; i<6 ; i++) {
+				if (this.territories[territory-1].adjacency[i]!=0) {
+					StdDraw.circle(this.territories[this.territories[territory-1].adjacency[i]-1].X, this.territories[this.territories[territory-1].adjacency[i]-1].Y, 35);
+					//On cherche dans le tab d'adjacence les id des territoires adjacents au territoire courant,
+					//puis on cherche les pos X et Y de ces territoires pour dessiner les cercles
+				}
+			}
 		}
 	}
 	

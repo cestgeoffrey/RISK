@@ -39,7 +39,6 @@ public class Game {
 		
 		while (!StdDraw.isKeyPressed(32)) {
 			if (StdDraw.isMousePressed()) {	
-				System.out.println(StdDraw.isMousePressed());
 				if (this.isBetween(228.0, 407.0, 366.0, 506.0)) {
 					PlayerCount = 2;
 				}
@@ -101,7 +100,119 @@ public class Game {
 		}
 		
 		
-		/*double X1=0, X2=0, Y1=0, Y2=0;
+		
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	
+	
+	
+	public void launch(int PlayerCount, int ActivateAI){
+		
+		this.Plateau.initialize(PlayerCount, ActivateAI);
+		while (this.moreThan1Alive()){
+			
+			for (int playingPlayer=1; playingPlayer <= 6; playingPlayer++) {
+				if (this.Plateau.players[playingPlayer-1].alive) {
+					this.Plateau.players[playingPlayer-1].reinforcements = this.calculateReinforcements(playingPlayer);
+					this.listenPhase1(playingPlayer);
+				}
+				
+					
+				
+			}
+		}
+		// TODO Dire qui a gagne
+	}
+	
+	
+	
+	
+	
+	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	
+	
+	
+	
+	public boolean isBetween(double x1, double y1, double x2, double y2) {
+		if (StdDraw.mouseX()>x1 && StdDraw.mouseX()<x2 && StdDraw.mouseY()>y1 && StdDraw.mouseY()<y2) {
+			return true;
+			
+		}
+		return false;
+		//Dans cette fonction, rentrez les coordonnées de votre hitbox.
+		//Pour récupérer les coordonnées d'une hitbox facilement, utilisez le code qui convertit vos clicks en coord x et y dans la console
+		//cliquez en bas à gauche puis en haut à droite de votre hitbox, puis utilisez dans l'ordre d'affichage dans la console les nombres en
+		//argument de la fonction (4 nombres par hitbox si tout est bon)
+	}
+	
+	public void drawRectangle(double x1, double y1, double x2, double y2) {
+		StdDraw.rectangle((x1+x2)/2,(y1+y2)/2,(x2-x1)/2,(y2-y1)/2);
+	}
+	
+	public boolean moreThan1Alive() {
+		int x = this.Plateau.territories[0].player;
+		for (int i=1; i<42; i++) {
+			if(this.Plateau.territories[i].player != x) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public int calculateReinforcements(int player) {
+		int T = 0;//Territoires controles
+		int N = 0;//Nombre de territoires par regions controlees
+		int M = 0;//Nombre de regiments gagnes en fonction des territoires captures
+		int[] territoryPerRegion = {0,0,0,0,0,0};
+		for (int i = 0; i<42; i++) {
+			if(this.Plateau.territories[i].player == player) {
+				T++;
+				territoryPerRegion[this.Plateau.territories[i].region-1]++;
+			}
+		}
+		if(territoryPerRegion[0]==9) {
+			N = N + 9;
+		}
+		if(territoryPerRegion[1]==7) {
+			N = N + 7;
+		}
+		if(territoryPerRegion[2]==12) {
+			N = N + 12;
+		}
+		if(territoryPerRegion[3]==4) {
+			N = N + 4;
+		}
+		if(territoryPerRegion[4]==6) {
+			N = N + 6;
+		}
+		if(territoryPerRegion[5]==4) {
+			N = N + 4;
+		}
+		for(int i = 0; i<this.Plateau.players[player-1].recentlyCaptured;i++) {
+			M= M + (int )(Math.random()*2); //50% de chance de gagner un regiment
+		}
+		
+		return (T/3)+(N/2)+M; //retourne le nombre de renforts
+		
+	}
+	
+	public void listenPhase1(int playingPlayer) {
+		double X1=0, X2=0, Y1=0, Y2=0;
 		int i = 0;
 		while (!StdDraw.isKeyPressed(32)) {
 			
@@ -119,39 +230,8 @@ public class Game {
 				StdDraw.pause(100);//Pause car isMousePressed reste true pendant qq ms (de trop !)
 			}
 			//Récupérateur de hitbox V2
-		}*/
-		
-		
-		
-	}
-	
-	
-	
-	public void launch(int PlayerCount, int ActivateAI){
-		
-		this.Plateau.initialize(PlayerCount, ActivateAI);
-		
-		
-		
-
-
-		
-	}
-	
-	public boolean isBetween(double x1, double y1, double x2, double y2) {
-		if (StdDraw.mouseX()>x1 && StdDraw.mouseX()<x2 && StdDraw.mouseY()>y1 && StdDraw.mouseY()<y2) {
-			return true;
-			
 		}
-		return false;
-		//Dans cette fonction, rentrez les coordonnées de votre hitbox.
-		//Pour récupérer les coordonnées d'une hitbox facilement, utilisez le code qui convertit vos clicks en coord x et y dans la console
-		//cliquez en bas à gauche puis en haut à droite de votre hitbox, puis utilisez dans l'ordre d'affichage dans la console les nombres en
-		//argument de la fonction (4 nombres par hitbox si tout est bon)
-	}
-	
-	public void drawRectangle(double x1, double y1, double x2, double y2) {
-		StdDraw.rectangle((x1+x2)/2,(y1+y2)/2,(x2-x1)/2,(y2-y1)/2);
+		
 	}
 	
 	
