@@ -212,9 +212,37 @@ public class Game {
 	}
 	
 	public void listenPhase1(int playingPlayer) {
-		double X1=0, X2=0, Y1=0, Y2=0;
-		int i = 0;
-		while (!StdDraw.isKeyPressed(32)) {
+		//double X1=0, X2=0, Y1=0, Y2=0;
+		//int i = 0;
+		int clickedInSea = 1;
+		while(Plateau.players[playingPlayer-1].reinforcements != 0) {
+			if(StdDraw.isMousePressed()) {
+				for (int i = 0; i<42 ; i++) {
+					if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
+						if(Plateau.territories[i].player == playingPlayer) {
+							this.Plateau.actualize(2, playingPlayer, i+1);
+							StdDraw.pause(150);
+						}else {
+							this.Plateau.actualize(1, playingPlayer, i+1);
+							StdDraw.pause(150);
+						}
+						clickedInSea = 0;
+						//this.Plateau.actualize(panel, player, territory);
+						
+					}
+				}
+				if(clickedInSea == 1) {
+					this.Plateau.actualize(0, playingPlayer, 0);
+					clickedInSea = 2;
+				}
+				if(clickedInSea == 0) {
+					clickedInSea = 1;
+				}
+			}
+		}
+		
+		
+		/*while (!StdDraw.isKeyPressed(32)) {
 			
 			if (StdDraw.isMousePressed()) {	
 				if(i == 0) {
@@ -230,7 +258,7 @@ public class Game {
 				StdDraw.pause(100);//Pause car isMousePressed reste true pendant qq ms (de trop !)
 			}
 			//Récupérateur de hitbox V2
-		}
+		}*/
 		
 	}
 	

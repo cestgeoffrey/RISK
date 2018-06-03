@@ -214,16 +214,24 @@ public class Board {
 		
 	}
 	
-	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
 	public void actualize( int panel, int player,int territory){
+		StdDraw.clear();
+		StdDraw.picture(this.x/2, this.y/2, "Map/Map.png");
 		this.writeTerritories();
 		this.writePanel(panel,player,territory);
 		this.writeColoredCube(player);
 		this.writeInRangeTerritories(panel,player,territory);
-		
+		StdDraw.show();
+
 	}
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
 	
 	public void writeTerritories() {
 		StdDraw.enableDoubleBuffering();
@@ -343,13 +351,15 @@ public class Board {
 			StdDraw.enableDoubleBuffering();
 			StdDraw.setPenColor(255,255,255);
 			StdDraw.setPenRadius(0.010);
-			for (int i = 0; i<6 ; i++) {
-				if (this.territories[territory-1].adjacency[i]!=0) {
-					StdDraw.circle(this.territories[this.territories[territory-1].adjacency[i]-1].X, this.territories[this.territories[territory-1].adjacency[i]-1].Y, 35);
-					//On cherche dans le tab d'adjacence les id des territoires adjacents au territoire courant,
-					//puis on cherche les pos X et Y de ces territoires pour dessiner les cercles
+			if(this.territories[territory-1].player == player) {
+				for (int i = 0; i<6 ; i++) {
+					if (this.territories[territory-1].adjacency[i]!=0) {
+						StdDraw.circle(this.territories[this.territories[territory-1].adjacency[i]-1].X, this.territories[this.territories[territory-1].adjacency[i]-1].Y, 35);
+						//On cherche dans le tab d'adjacence les id des territoires adjacents au territoire courant,
+						//puis on cherche les pos X et Y de ces territoires pour dessiner les cercles
+					}
 				}
-			}
+			}	
 		}
 	}
 	
