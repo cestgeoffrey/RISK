@@ -231,12 +231,16 @@ public class Board {
 				StdDraw.setPenColor(players[territories[i].player-1].color[0], players[territories[i].player-1].color[1], players[territories[i].player-1].color[2]);// couleur du player controlant le territoire
 				StdDraw.setPenRadius(0.015);
 				StdDraw.circle(territories[i].X, territories[i].Y, 22.5);
+				StdDraw.setPenColor(0, 0, 0);
+				StdDraw.text(territories[i].X, territories[i].Y-2, Integer.toString(this.powerEstimation(territories[i])));
+				
 			}
 			else {
 				StdDraw.setPenColor(255, 255, 255);
 				StdDraw.filledCircle(territories[i].X, territories[i].Y, 20);
 				StdDraw.setPenColor(0, 0, 0);
-				//StdDraw.text(0.5, 0.5, (String)0);
+				StdDraw.text(territories[i].X, territories[i].Y-2, "0");
+				
 				
 			}
 			StdDraw.show();
