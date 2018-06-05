@@ -32,6 +32,8 @@ public class Player {
 		x += this.canonnier;
 		return x;
 	}
+	
+	
 	 
 	
 }

@@ -212,37 +212,57 @@ public class Game {
 	}
 	
 	public void listenPhase1(int playingPlayer) {
-		//double X1=0, X2=0, Y1=0, Y2=0;
-		//int i = 0;
-		int clickedInSea = 1;
+
+		//this.Plateau.actualize(2, playingPlayer, 1); //A SUPP
+		//CLICKED IN SEA A CHANGER POUR LE CAS OU RENFORT = 0
+		
+		boolean stillOnPanel = true;
+		boolean clickedInSea = true;
 		while(Plateau.players[playingPlayer-1].reinforcements != 0) {
 			if(StdDraw.isMousePressed()) {
+				clickedInSea = true;
 				for (int i = 0; i<42 ; i++) {
 					if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
 						if(Plateau.territories[i].player == playingPlayer) {
 							this.Plateau.actualize(2, playingPlayer, i+1);
-							StdDraw.pause(150);
+							while(stillOnPanel) {
+								stillOnPanel = this.listenReinforcements(playingPlayer, i+1) ;
+								this.Plateau.actualize(2, playingPlayer, i+1);
+								
+								//Si le joueur n'a plus de renforts a attribuer, on lui fait quitter le panel de force
+								if(Plateau.players[playingPlayer-1].reinforcements == 0 && this.powerInHand(playingPlayer) == 0 ) {
+									stillOnPanel = false;
+								}
+								//System.out.println(stillOnPanel);
+							}
+							stillOnPanel = true;
+							this.abortRHand(playingPlayer);
+							//StdDraw.pause(150);
 						}else {
 							this.Plateau.actualize(1, playingPlayer, i+1);
 							StdDraw.pause(150);
 						}
-						clickedInSea = 0;
+						clickedInSea = false;
 						//this.Plateau.actualize(panel, player, territory);
 						
 					}
 				}
-				if(clickedInSea == 1) {
-					this.Plateau.actualize(0, playingPlayer, 0);
-					clickedInSea = 2;
+				if (this.isBetween(1025.0, 0.0, 1364.0, 669.0)) {
+					clickedInSea = false;
 				}
-				if(clickedInSea == 0) {
-					clickedInSea = 1;
+				if(clickedInSea) {
+					this.Plateau.actualize(0, playingPlayer, 0);
 				}
 			}
 		}
 		
 		
-		/*while (!StdDraw.isKeyPressed(32)) {
+		
+		
+		/*double X1=0, X2=0, Y1=0, Y2=0;
+		int i = 0;
+		
+		while (!StdDraw.isKeyPressed(32)) {
 			
 			if (StdDraw.isMousePressed()) {	
 				if(i == 0) {
@@ -255,16 +275,106 @@ public class Game {
 					System.out.println(X1 +", "+Y1 +", "+X2 +", "+Y2);
 					i = 0;
 				}
-				StdDraw.pause(100);//Pause car isMousePressed reste true pendant qq ms (de trop !)
+				StdDraw.pause(150);//Pause car isMousePressed reste true pendant qq ms (de trop !)
 			}
 			//Récupérateur de hitbox V2
 		}*/
 		
 	}
 	
+	public boolean listenReinforcements( int player , int territory) {
+		System.out.println("AH");
+		StdDraw.pause(150);
+		while(true) {
+			if (StdDraw.isMousePressed()) {
+				if(this.isBetween(1064.0, 406.0, 1119.0, 461.0)) {
+					this.addInRHand(player, 3);
+				}
+				if(this.isBetween(1162.0, 404.0, 1218.0, 460.0)) {
+					this.addInRHand(player, 2);
+				}			
+				if(this.isBetween(1260.0, 406.0, 1317.0, 462.0)) {
+					this.addInRHand(player, 1);
+				}	
+				if(this.isBetween(1062.0, 322.0, 1117.0, 376.0)) {
+					this.addInRHand(player, 3);
+				}
+				if(this.isBetween(1165.0, 324.0, 1216.0, 377.0)) {
+					this.addInRHand(player, 2);
+				}
+				if(this.isBetween(1262.0, 324.0, 1316.0, 377.0)) {
+					this.addInRHand(player, 1);
+				}
+				if(this.isBetween(1134.0, 209.0, 1245.0, 277.0)) {
+					this.abortRHand(player);
+				}
+				if(this.isBetween(1105.0, 54.0, 1272.0, 107.0)) {
+					this.confirmR(player, territory);
+				}
+				if(this.isBetween(1025.0, 0.0, 1364.0, 669.0) || this.isBetween(Plateau.territories[territory-1].X-28, Plateau.territories[territory-1].Y-28,Plateau.territories[territory-1].X+28 , Plateau.territories[territory-1].Y+28)) {
+					return true; //est toujours sur panel ou a clique sur mm territoire, indique à la supermethode de l'appeler a nouveau
+				}
+				else {
+					//System.out.println((Plateau.territories[territory].X-28) + ",  " +(Plateau.territories[territory].Y-28) +", " + (Plateau.territories[territory].X+28) + ", " +  (Plateau.territories[territory].Y+28));
+					//System.out.println(StdDraw.mouseX() + " , " + StdDraw.mouseY());
+					return false;
+				}
+			}
+			
+				
+			
+			
+			
+		}
+	}
 	
 	
 	
+	
+	
+		//ADD IN REINFORCEMENTS HAND
+		//methode qui prend en entree un joueur, l'unité desiree en vue de potentiel attribution de renforts (musketman = 2, canonnier = 1 et horseman = 3)
+		//et qui change ou non la main de renforts du joueur (sil il possede assez de renforts)
+		public void addInRHand(int player, int unit) {
+			
+			
+			if(this.Plateau.players[player-1].reinforcements >= 1 && unit == 2) {
+				this.Plateau.players[player-1].reinforcements --;
+				this.Plateau.players[player-1].musketman[0]+=1;
+			}
+			if(this.Plateau.players[player-1].reinforcements >= 3 && unit == 3) {
+				this.Plateau.players[player-1].reinforcements = this.Plateau.players[player-1].reinforcements - 3;
+				this.Plateau.players[player-1].horseman[0]+=1;
+			}
+			if(this.Plateau.players[player-1].reinforcements >= 7 && unit == 1) {
+				this.Plateau.players[player-1].reinforcements = this.Plateau.players[player-1].reinforcements - 7;
+				this.Plateau.players[player-1].canonnier+=1;
+			}
+		}
+		//Utilisee lorque l'user ne confirme pas les renforts ou clique autre part de la map
+		//Met a zero la main du joueur et rembourse les renforts
+		public void abortRHand(int player) {
+			int powerInHand = this.powerInHand(player);
+			this.Plateau.players[player-1].reinforcements += powerInHand;
+			this.Plateau.players[player-1].musketman[0] = 0;
+			this.Plateau.players[player-1].horseman[0] = 0;
+			this.Plateau.players[player-1].canonnier = 0;
+		}
+		
+		public int powerInHand(int player) {
+			return this.Plateau.players[player-1].musketman[0]+(3*this.Plateau.players[player-1].horseman[0])+(7*this.Plateau.players[player-1].canonnier);
+		}
+		//CONFIRM REINFORCEMENTS
+		//Assigne les troupes à leur territoire et vide la main du joueur
+		//Prend en entree le joueur et l'ID territoire
+		public void confirmR (int player, int territory) {
+			this.Plateau.territories[territory-1].musketman[0]+= this.Plateau.players[player-1].musketman[0];
+			this.Plateau.territories[territory-1].horseman[0]+= this.Plateau.players[player-1].horseman[0];
+			this.Plateau.territories[territory-1].canonnier[0]+= this.Plateau.players[player-1].canonnier;
+			this.Plateau.players[player-1].musketman[0] = 0;
+			this.Plateau.players[player-1].horseman[0] = 0;
+			this.Plateau.players[player-1].canonnier = 0;
+		}
 	
 	//Board Plateau = new Board();
 	//Plateau.initialize();

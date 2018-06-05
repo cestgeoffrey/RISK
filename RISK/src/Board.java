@@ -365,8 +365,8 @@ public class Board {
 	
 	public int powerEstimation(Territory territory) {
 		int x = territory.musketman[0]+territory.musketman[1]+territory.musketman[2];
-		x+= territory.horseman[0]+territory.horseman[1]+territory.horseman[2]+territory.horseman[3];
-		x+= territory.canonnier[0]+territory.canonnier[1];
+		x+= (territory.horseman[0]+territory.horseman[1]+territory.horseman[2]+territory.horseman[3])*3;
+		x+= (territory.canonnier[0]+territory.canonnier[1])*7;
 		return x;
 	}
 }
