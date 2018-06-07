@@ -319,7 +319,7 @@ public class Game {
 									this.Plateau.actualize(4, playingPlayer, i+1);
 									if(orderFeedback <43 && orderFeedback >0) {
 										this.move(playingPlayer, i+1, orderFeedback);
-										System.out.println("NN CA RENTR PA MDR");
+										//System.out.println("NN CA RENTR PA MDR");
 										orderFeedback = 100;
 										this.Plateau.actualize(4, playingPlayer, i+1);
 									}
@@ -333,6 +333,7 @@ public class Game {
 							}
 							else {
 								this.Plateau.actualize(3, playingPlayer, i+1);
+								orderFeedback = 100;
 								while(orderFeedback == 100) {
 									orderFeedback = this.listenIntel(playingPlayer, i+1) ;
 									//System.out.println(orderFeedback);
