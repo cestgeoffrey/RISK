@@ -354,6 +354,7 @@ public class Board {
 			if(this.territories[territory-1].player == player) {
 				for (int i = 0; i<6 ; i++) {
 					if (this.territories[territory-1].adjacency[i]!=0) {
+						
 						StdDraw.circle(this.territories[this.territories[territory-1].adjacency[i]-1].X, this.territories[this.territories[territory-1].adjacency[i]-1].Y, 35);
 						//On cherche dans le tab d'adjacence les id des territoires adjacents au territoire courant,
 						//puis on cherche les pos X et Y de ces territoires pour dessiner les cercles

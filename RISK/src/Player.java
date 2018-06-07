@@ -15,7 +15,7 @@ public class Player {
 	int[] color= new int[3];
 	boolean alive = false;
 	boolean AI;
-	int[][]ATKmatrix = {{0,0,0},{0,0,0},{0,0,0}}; //premiere colonne: pts d'ATK, 2nd : priorité defensive, 3e : pts de mouvements
+	
 	
 	public Player(int number, int R, int G, int B) {
 		this.number = number;

@@ -125,9 +125,9 @@ public class Game {
 			for (int playingPlayer=1; playingPlayer <= 6; playingPlayer++) {
 				if (this.Plateau.players[playingPlayer-1].alive) {
 					this.Plateau.players[playingPlayer-1].reinforcements = this.calculateReinforcements(playingPlayer);
-					//this.listenPhase1(playingPlayer);
-					//this.listenPhase2(playingPlayer);
-					double X1=0, X2=0, Y1=0, Y2=0;
+					this.listenPhase1(playingPlayer);
+					this.superInstinct(playingPlayer);
+					/*double X1=0, X2=0, Y1=0, Y2=0;
 					int i = 0;
 					
 					while (!StdDraw.isKeyPressed(32)) {
@@ -146,7 +146,7 @@ public class Game {
 							StdDraw.pause(150);//Pause car isMousePressed reste true pendant qq ms (de trop !)
 						}
 						//Récupérateur de hitbox V2
-					}
+					}*/
 				}
 				
 					
@@ -274,6 +274,7 @@ public class Game {
 					this.Plateau.actualize(0, playingPlayer, 0);
 				}
 			}
+			this.clearHand(playingPlayer);
 		}
 		
 		
@@ -302,12 +303,56 @@ public class Game {
 		
 	}
 	
+	public void superInstinct(int playingPlayer) {
+		int orderFeedback = 100;
+		while (orderFeedback!=101) {
+			if (StdDraw.isMousePressed()) {
+				if(this.isBetween(0.0,0.0,1025.0,670.0)) {
+					for (int i = 0; i<42 ; i++) {
+						if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
+							if(Plateau.territories[i].player == playingPlayer) {
+								orderFeedback = 100;
+								while(orderFeedback == 100) {//tant que feedback est different de 100 (100 = recommencer), continuer d
+									
+									orderFeedback = this.listenOrders(playingPlayer, i+1) ;
+									this.Plateau.actualize(4, playingPlayer, i+1);
+									if(orderFeedback <43 && orderFeedback >0) {
+										this.move(playingPlayer, i+1, orderFeedback);
+										System.out.println("NN CA RENTR PA MDR");
+										orderFeedback = 100;
+										this.Plateau.actualize(4, playingPlayer, i+1);
+									}
+									if(orderFeedback == 0) {//a clique dans la mer
+										this.abortHand(playingPlayer, i+1);
+										this.Plateau.actualize(0, playingPlayer, 0);
+										//System.out.println(this.Plateau.territories[i].troopsInTerritory());
+										//this.Plateau.actualize(4, playingPlayer, i+1);
+									}
+								} //fin du while
+							}
+							else {
+								this.Plateau.actualize(3, playingPlayer, i+1);
+								while(orderFeedback == 100) {
+									orderFeedback = this.listenIntel(playingPlayer, i+1) ;
+									System.out.println(orderFeedback);
+								}
+							}
+						}
+					}	
+				}
+				//System.out.println("iiiiiiiiiiiiiiiii");
+			}
+			//System.out.println("OHOHOH");
+		}
+	}
+	
+	
 	public void listenPhase2(int playingPlayer) {
 		int orderFeedback = 100;// code 100 = continuer d'ecouter le panel de commande des ordres, code 1 - 42 = declencher un mouvement de troups vers 
 		//ce numero de territoire, code 0 = cesser d'ecouter le panel d'ordres, code 101 passer le tour du joueur
 		boolean clickedInSea = true;
 		boolean continu = true;//reste vrai tant que le joueur n'a pas passé son tour
-		while(continu) {
+		while(orderFeedback != 101) {
 			if(StdDraw.isMousePressed()) {
 				clickedInSea = true;
 				for (int i = 0; i<42 ; i++) {
@@ -317,23 +362,24 @@ public class Game {
 							while(orderFeedback == 100) {
 								orderFeedback = this.listenOrders(playingPlayer, i+1) ;
 								this.Plateau.actualize(4, playingPlayer, i+1);
-								//////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-								
-								//Si le joueur n'a plus de renforts a attribuer, on lui fait quitter le panel de force
-								if(Plateau.players[playingPlayer-1].reinforcements == 0 && this.powerInHand(playingPlayer) == 0 ) {
-									stillOnPanel = false;
+								if(orderFeedback <43 && orderFeedback >0) {
+									this.move(playingPlayer, i+1, orderFeedback);
+									orderFeedback = 100;
+									clickedInSea = false;
 								}
+								if(orderFeedback == 0) {//a clique dans la mer
+									this.abortHand(playingPlayer, i+1);
+									clickedInSea = true;
+
+								}
+								//Si le joueur n'a plus de renforts a attribuer, on lui fait quitter le panel de force
 								//System.out.println(stillOnPanel);
 							}
-							
-							
-							
-							
-							stillOnPanel = true;
-							this.abortRHand(playingPlayer);
-							//StdDraw.pause(150);
+				
 						}else {
-							this.Plateau.actualize(1, playingPlayer, i+1);
+							this.Plateau.actualize(3, playingPlayer, i+1);
+							//clickedInSea == false;
+							
 							StdDraw.pause(150);
 						}
 						clickedInSea = false;
@@ -456,26 +502,70 @@ public class Game {
 		}
 	}
 	
+	public int listenIntel( int player , int territory) {
+		StdDraw.pause(150);
+		while(true) {
+			if (StdDraw.isMousePressed()) {
+				
+				
+				if(this.isBetween(1225.0, 22.0, 1329.0, 78.0)) {
+					
+					return 101; //Le joueur choisit de terminer son tour, indique à la supermethode de stopper l'ecoute de la phase 2
+				}
+				
+				//PASSE ^
+				
+				/*for (int i = 0; i<42 ; i++) {
+					if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
+						if(i+1 == territory) {
+							return 100; //le joueur a juste reclicke sur son territoire, on garde le panel intact
+						}else {
+							
+						}
+						return i+1; // retourne l'id du territoire recepteur d'une attaque ou d'un mouvement de troupes
+					}
+				}*/
+				
+				
+				if(this.isBetween(1025.0, 0.0, 1364.0, 669.0)) {
+					return 100; //est toujours sur panel ou a clique sur mm territoire, indique à la supermethode de l'appeler a nouveau
+				}
+				else {
+					//System.out.println((Plateau.territories[territory].X-28) + ",  " +(Plateau.territories[territory].Y-28) +", " + (Plateau.territories[territory].X+28) + ", " +  (Plateau.territories[territory].Y+28));
+					//System.out.println(StdDraw.mouseX() + " , " + StdDraw.mouseY());
+					return 0;//indique a la supermethode de cesser le while
+				}
+			}
+			
+				
+			
+			
+			
+		}
+	}
+	
 	public void addHand(int player, int unit, int mvt, int territory) {
 		//mvt = points de mouvements deja consommes par l'unite
 		//territory = territoire de départ de l'unite
 		//unit = type d'unite, 1 = canonnier 2 = musketman 3 = horseman
-		if (unit == 1) {
-			if(this.Plateau.territories[territory-1].canonnier[mvt]>0) {
-				this.Plateau.territories[territory-1].canonnier[mvt]--;
-				this.Plateau.players[player-1].canonnier++;
+		if(this.Plateau.territories[territory-1].troopsInTerritory()>1) {
+			if (unit == 1) {
+				if(this.Plateau.territories[territory-1].canonnier[mvt]>0) {
+					this.Plateau.territories[territory-1].canonnier[mvt]--;
+					this.Plateau.players[player-1].canonnier++;
+				}
 			}
-		}
-		if (unit == 2) {
-			if(this.Plateau.territories[territory-1].musketman[mvt]>0) {
-				this.Plateau.territories[territory-1].musketman[mvt]--;
-				this.Plateau.players[player-1].musketman[mvt]++;
+			if (unit == 2) {
+				if(this.Plateau.territories[territory-1].musketman[mvt]>0) {
+					this.Plateau.territories[territory-1].musketman[mvt]--;
+					this.Plateau.players[player-1].musketman[mvt]++;
+				}
 			}
-		}
-		if (unit == 3) {
-			if(this.Plateau.territories[territory-1].horseman[mvt]>0) {
-				this.Plateau.territories[territory-1].horseman[mvt]--;
-				this.Plateau.players[player-1].horseman[mvt]++;
+			if (unit == 3) {
+				if(this.Plateau.territories[territory-1].horseman[mvt]>0) {
+					this.Plateau.territories[territory-1].horseman[mvt]--;
+					this.Plateau.players[player-1].horseman[mvt]++;
+				}
 			}
 		}
 		
@@ -514,12 +604,12 @@ public class Game {
 	}
 	
 	public void abortHand(int player, int territory) {
-		this.Plateau.territories[territory-1].canonnier[0] = this.Plateau.players[player-1].canonnier;
-		this.Plateau.territories[territory-1].musketman[0] = this.Plateau.players[player-1].musketman[0];
-		this.Plateau.territories[territory-1].musketman[1] = this.Plateau.players[player-1].musketman[1];
-		this.Plateau.territories[territory-1].horseman[0] = this.Plateau.players[player-1].horseman[0];
-		this.Plateau.territories[territory-1].horseman[1] = this.Plateau.players[player-1].horseman[1];
-		this.Plateau.territories[territory-1].horseman[2] = this.Plateau.players[player-1].horseman[2];
+		this.Plateau.territories[territory-1].canonnier[0] += this.Plateau.players[player-1].canonnier;
+		this.Plateau.territories[territory-1].musketman[0] += this.Plateau.players[player-1].musketman[0];
+		this.Plateau.territories[territory-1].musketman[1] += this.Plateau.players[player-1].musketman[1];
+		this.Plateau.territories[territory-1].horseman[0] += this.Plateau.players[player-1].horseman[0];
+		this.Plateau.territories[territory-1].horseman[1] += this.Plateau.players[player-1].horseman[1];
+		this.Plateau.territories[territory-1].horseman[2] += this.Plateau.players[player-1].horseman[2];
 		this.clearHand(player);
 	}
 	
@@ -631,150 +721,252 @@ public class Game {
 			
 			
 			
-			int DEFmusketman = this.Plateau.territories[target-1].getMusketman();
-			int ATKhorseman = this.Plateau.players[player-1].horseman[0]+this.Plateau.players[player-1].horseman[1]+this.Plateau.players[player-1].horseman[2];
-			int DEFhorseman = this.Plateau.territories[target-1].getHorseman();
-			int[] ATK = new int[3];
-			int[] DEF = new int[3];
-			ATK[0]= ATKhorseman;
-			ATK[1]= ATKmusketman;
-			ATK[2]= ATKcanonnier;
-			DEF[0]= DEFmusketman;
-			DEF[1]= DEFcanonnier;
-			DEF[2]= DEFhorseman;
-			int attackerCode = 0;
-			int defenserCode = 0;
-			boolean dududuel = false;
-			 
-			 
-				  //deplacement vers allie
-			if(this.Plateau.territories[territory-1].player==this.Plateau.territories[target-1].player){
-				    this.Plateau.territories[target-1].horseman[1]+=this.Plateau.players[player-1].horseman[0];
-				    this.Plateau.territories[target-1].horseman[2]+=this.Plateau.territories[player-1].horseman[1];
-				    this.Plateau.territories[target-1].horseman[3]+=this.Plateau.territories[player-1].horseman[2];
-				    this.Plateau.territories[target-1].horseman[1]+=this.Plateau.territories[player-1].musketman[0];
-				    this.Plateau.territories[target-1].horseman[2]+=this.Plateau.territories[player-1].musketman[1];
-				    this.Plateau.territories[target-1].canonnier[1]+=this.Plateau.territories[player-1].canonnier[0];
-				    this.clearHand(player-1);
-				    return 0;
+			//int DEFmusketman = this.Plateau.territories[target-1].getMusketman();
+			//int ATKhorseman = this.Plateau.players[player-1].horseman[0]+this.Plateau.players[player-1].horseman[1]+this.Plateau.players[player-1].horseman[2];
+			//int DEFhorseman = this.Plateau.territories[target-1].getHorseman();
+			//int[] ATK = new int[3];
+			//int[] DEF = new int[3];
+			//ATK[0]= ATKhorseman;
+			//ATK[1]= ATKmusketman;
+			//ATK[2]= ATKcanonnier;
+			//DEF[0]= DEFmusketman;
+			//DEF[1]= DEFcanonnier;
+			//DEF[2]= DEFhorseman;
+			//int attackerCode = 0;
+			//int defenserCode = 0;
+			//boolean dududuel = false;
+			//deplacement vers allie
+			boolean isAdjacent = false;
+			for (int i = 0; i <6; i++) {
+				if (this.Plateau.territories[territory-1].adjacency[i]==target) {
+					isAdjacent = true;
+				}
 			}
-			else if(this.Plateau.players[player-1].troopsInHand() <= 3) {
-				int[][]ATKmatrix = {{0,0,0},{0,0,0},{0,0,0}}; //premiere colonne: pts d'ATK, 2nd : priorité defensive, 3e : pts de mvt deja utilises
-				int[][]DEFmatrix = {{0,0},{0,0}}; //ATK et priorite
-				int ATKcanonnier = this.Plateau.players[player-1].canonnier;
-				int DEFcanonnier = this.Plateau.territories[target-1].getCanonnier();
-				int ATKmusketman = this.Plateau.players[player-1].musketman[0]+this.Plateau.players[player-1].musketman[1];
+			if(isAdjacent) {
+			
+			
+				//System.out.println("atk" + ATKmatrix[0][1] + " " + ATKmatrix[1][1] + " " + ATKmatrix[2][1]);
 				
-				
-				
-				//parcourt la main du joueur et remplit une matrice facilement lisible par le programme (ATKmatrix)
-				for (int i = 0; i < 3; i++) {
-					for (int mus = 0; mus <1; mus++) {
+				if(this.Plateau.territories[territory-1].player==this.Plateau.territories[target-1].player){
+					    this.Plateau.territories[target-1].horseman[1]+=this.Plateau.players[player-1].horseman[0];
+					    this.Plateau.territories[target-1].horseman[2]+=this.Plateau.players[player-1].horseman[1];
+					    this.Plateau.territories[target-1].horseman[3]+=this.Plateau.players[player-1].horseman[2];
+					    this.Plateau.territories[target-1].musketman[1]+=this.Plateau.players[player-1].musketman[0];
+					    this.Plateau.territories[target-1].musketman[2]+=this.Plateau.players[player-1].musketman[1];
+					    this.Plateau.territories[target-1].canonnier[1]+=this.Plateau.players[player-1].canonnier;
+					    //System.out.println(this.Plateau.players[player-1].musketman[0]);
+					    //System.out.println(this.Plateau.players[player-1].musketman[1]);
+					    this.clearHand(player);
+					    
+					    return 0;
+				}
+				else if(this.Plateau.players[player-1].troopsInHand() <= 3 && this.Plateau.players[player-1].troopsInHand() != 0) {
+					//System.out.println("override");
+					int[][]ATKmatrix = {{0,0,0},{0,0,0},{0,0,0}}; //premiere colonne: pts d'ATK, 2nd : priorité defensive, 3e : pts de mvt deja utilises
+					int[][]DEFmatrix = {{0,0},{0,0}}; //ATK et priorite
+					int ATKcanonnier = this.Plateau.players[player-1].canonnier;
+					int DEFcanonnier = this.Plateau.territories[target-1].getCanonnier();
+					int ATKmusketman = this.Plateau.players[player-1].musketman[0]+this.Plateau.players[player-1].musketman[1];
+					
+					
+					
+					//parcourt la main du joueur et remplit une matrice facilement lisible par le programme (ATKmatrix)
+					for (int i = 0; i < 3; i++) {
+						for (int mus = 0; mus <1; mus++) {
+							if(ATKmatrix[i][0]==0) {
+								if(this.Plateau.players[player-1].musketman[mus]!=0) {
+									this.Plateau.players[player-1].musketman[mus]-=1;
+									ATKmatrix[i][0] = (int )(Math.random() * 6 + 1);
+									ATKmatrix[i][1] = 2;
+									ATKmatrix[i][2] = mus;
+								}
+							}
+						}
+						for (int hor = 0; hor <2; hor++) {
+							if(ATKmatrix[i][0]==0) {
+								if(this.Plateau.players[player-1].horseman[hor]!=0) {
+									this.Plateau.players[player-1].horseman[hor]--;
+									ATKmatrix[i][0] = (int )(Math.random() * 7 + 2);
+									ATKmatrix[i][1] = 3;
+									ATKmatrix[i][2] = hor;
+								}
+							}
+						}
 						if(ATKmatrix[i][0]==0) {
-							if(this.Plateau.players[player-1].musketman[mus]!=0) {
-								this.Plateau.players[player].musketman[mus]--;
-								ATKmatrix[i][0] = (int )(Math.random() * 7 + 1);
-								ATKmatrix[i][1] = 2;
-								ATKmatrix[i][2] = mus;
+							if(this.Plateau.players[player-1].canonnier!=0) {
+								this.Plateau.players[player].canonnier--;
+								ATKmatrix[i][0] = (int)(Math.random() * 9 + 4);
+								ATKmatrix[i][1] = 1;
+								ATKmatrix[i][2] = 0;
+							}
+						}
+						
+						
+					}
+					System.out.println(ATKmatrix[0][0] + " " + ATKmatrix[1][0] + " " + ATKmatrix[2][0]);
+					
+					//defense matrix
+					for (int i = 0; i < 2 ; i++) {
+						if(this.Plateau.territories[target-1].musketman[0] > 0) {
+							if(DEFmatrix[i][0] == 0) {
+								this.Plateau.territories[target-1].musketman[0]--;
+								DEFmatrix[i][0]= (int )(Math.random() * 6 + 1);
+								DEFmatrix[i][1]= 2;
+							}
+						}
+						if(this.Plateau.territories[target-1].canonnier[0] > 0) {
+							if(DEFmatrix[i][0] == 0) {
+								this.Plateau.territories[target-1].canonnier[0]--;
+								DEFmatrix[i][0]= (int )(Math.random() * 7 + 4);
+								DEFmatrix[i][1]= 1;
+							}
+						}
+						if(this.Plateau.territories[target-1].horseman[0] > 0) {
+							if(DEFmatrix[i][0] == 0) {
+								this.Plateau.territories[target-1].horseman[0]--;
+								DEFmatrix[i][0]= (int )(Math.random() * 9 + 2);
+								DEFmatrix[i][1]= 3;
 							}
 						}
 					}
-					for (int hor = 0; hor <2; hor++) {
-						if(ATKmatrix[i][0]==0) {
-							if(this.Plateau.players[player-1].horseman[hor]!=0) {
-								this.Plateau.players[player].musketman[hor]--;
-								ATKmatrix[i][0] = (int )(Math.random() * 8 + 2);
-								ATKmatrix[i][1] = 3;
-								ATKmatrix[i][2] = hor;
+					System.out.println(DEFmatrix[0][0]+ " " + DEFmatrix[1][0]);
+					
+					//tri de la matrice d'ATK selon les atk plus puissantes ou priorités
+					int memory1;
+					int memory2;
+					int memory3;
+					for (int i = 0; i<2; i++) {
+						for (int j =0; j<2; j++) {
+							if(ATKmatrix[j][0]<ATKmatrix[j+1][0] || (ATKmatrix[j][0]==ATKmatrix[j+1][0] && ATKmatrix[j][1]<ATKmatrix[j+1][1])) { //swap
+								memory1 = ATKmatrix[j][0];
+								memory2 = ATKmatrix[j][1];
+								memory3 = ATKmatrix[j][2];
+								ATKmatrix[j][0] = ATKmatrix[j+1][0];
+								ATKmatrix[j][1] = ATKmatrix[j+1][1];
+								ATKmatrix[j][2] = ATKmatrix[j+1][2];
+								ATKmatrix[j+1][0] = memory1;
+								ATKmatrix[j+1][1] = memory2;
+								ATKmatrix[j+1][2] = memory3;
+							}
+						
+						}
+						
+					}
+					
+					//tri matrice defense
+					if(DEFmatrix[0][0]<DEFmatrix[1][0] || (DEFmatrix[0][0]==DEFmatrix[1][0] && DEFmatrix[0][1]<DEFmatrix[1][1] && DEFmatrix[1][1]!=3)) {
+						//si l'atk de 2 est supérieur à l'attaque de 1, swap
+						//si l'atk de 2 et 1 sont egales et que le code d'unite (pt de mvt max) de 2 est plus grand que le code d'unite de 1
+						//excepte si ce code est 3 (horseman), alors swap. Ceci donne toujours 2 - 1 - 3 (soldat - canon - cavalier)
+						memory1 = DEFmatrix[0][0];
+						memory2 = DEFmatrix[0][1];
+						DEFmatrix[0][0] = DEFmatrix[1][0];
+						DEFmatrix[0][1] = DEFmatrix[1][1];
+						DEFmatrix[1][0] = memory1;
+						DEFmatrix[1][1] = memory2;
+					}
+					
+					for (int i=0; i<2; i++) {
+						if(DEFmatrix[i][0] >= ATKmatrix[i][0]) {
+							//System.out.println("OH");
+							ATKmatrix[i][0]=0;
+							ATKmatrix[i][1]=0;
+							ATKmatrix[i][2]=0;
+						}else {
+							//System.out.println("OH");
+							DEFmatrix[i][0]=0;
+							DEFmatrix[i][1]=0;
+						}
+					}
+					//System.out.println(ATKmatrix[0][0] + " " + ATKmatrix[1][0] + " " + ATKmatrix[2][0]);
+					//System.out.println(DEFmatrix[0][0]+ " " + DEFmatrix[1][0]);
+					
+					//rapatriement matrice de defense dans territoire target
+					for (int i=0; i<2; i++) {
+						if(DEFmatrix[i][1]==2) {//si unit = 2, rapatrier un musketman
+							this.Plateau.territories[target-1].musketman[0]++;
+							DEFmatrix[i][0]=0;
+							DEFmatrix[i][1]=0;
+						}
+						if(DEFmatrix[i][1]==1) {//si unit = 1, rapatrier un canonnier
+							this.Plateau.territories[target-1].canonnier[0]++;
+							DEFmatrix[i][0]=0;
+							DEFmatrix[i][1]=0;
+						}
+						if(DEFmatrix[i][1]==3) {//si unit = 3, rapatrier un horseman
+							this.Plateau.territories[target-1].horseman[0]++;
+							DEFmatrix[i][0]=0;
+							DEFmatrix[i][1]=0;
+						}
+					}
+					
+					if(ATKmatrix[0][0]+ATKmatrix[1][0]+ATKmatrix[1][0] != 0) {//si matrice d'atk n'est pas vide
+						if(this.Plateau.territories[target-1].troopsInTerritory() ==0) {//si le territoire target est sans defense
+							this.Plateau.territories[target-1].player = player;
+							for (int i = 0; i<3; i++) {
+								if(ATKmatrix[i][1]==2) {//si l'unite dans cette colonne de la matrice est un musketman, mettre a 0 cette colonne et
+									//transferer le musketman vers la memoire d'unites du territoire cible (on lui retire un pt de mouvement neanmoins)
+									this.Plateau.territories[target-1].musketman[ATKmatrix[i][2]+1]++;
+									ATKmatrix[i][0]=0;
+									ATKmatrix[i][1]=0;
+									ATKmatrix[i][2]=0;
+									
+								}
+								if(ATKmatrix[i][1]==1) {
+									this.Plateau.territories[target-1].canonnier[ATKmatrix[i][2]+1]++;
+									ATKmatrix[i][0]=0;
+									ATKmatrix[i][1]=0;
+									ATKmatrix[i][2]=0;
+								}
+								if(ATKmatrix[i][1]==3) {
+									this.Plateau.territories[target-1].horseman[ATKmatrix[i][2]+1]++;
+									ATKmatrix[i][0]=0;
+									ATKmatrix[i][1]=0;
+									ATKmatrix[i][2]=0;
+								}
+								
+							}
+						}else {
+							//rapatrier unites vers territoire de depart sans leur faire perdre de pt de mouvement 
+							for (int i = 0; i<3; i++) {
+								if(ATKmatrix[i][1]==2) {
+									
+									this.Plateau.players[player-1].musketman[ATKmatrix[i][2]]++;
+									ATKmatrix[i][0]=0;
+									ATKmatrix[i][1]=0;
+									ATKmatrix[i][2]=0;
+								}
+								if(ATKmatrix[i][1]==1) {
+									this.Plateau.players[player-1].canonnier++;
+									ATKmatrix[i][0]=0;
+									ATKmatrix[i][1]=0;
+									ATKmatrix[i][2]=0;
+								}
+								if(ATKmatrix[i][1]==3) {
+									this.Plateau.players[player-1].horseman[ATKmatrix[i][2]]++;
+									ATKmatrix[i][0]=0;
+									ATKmatrix[i][1]=0;
+									ATKmatrix[i][2]=0;
+								}
+								
 							}
 						}
 					}
-					if(ATKmatrix[i][0]==0) {
-						if(this.Plateau.players[player-1].canonnier!=0) {
-							this.Plateau.players[player].canonnier--;
-							ATKmatrix[i][0] = (int)(Math.random() * 10 + 4);
-							ATKmatrix[i][1] = 1;
-							ATKmatrix[i][2] = 0;
-						}
-					}
+							  
+					
+						  
+					 
+				} ///ici
+					
+							
+						    
+						     
+						  
 					
 					
 				}
-				
-				//defense matrix
-				for (int i = 0; i < 2 ; i++) {
-					if(this.Plateau.territories[target-1].musketman[0] > 0) {
-						if(DEFmatrix[i][0] != 0) {
-							this.Plateau.territories[target-1].musketman[0]--;
-							DEFmatrix[i][0]= (int )(Math.random() * 7 + 1);
-							DEFmatrix[i][1]= 2;
-						}
-					}
-					if(this.Plateau.territories[target-1].canonnier[0] > 0) {
-						if(DEFmatrix[i][0] != 0) {
-							this.Plateau.territories[target-1].canonnier[0]--;
-							DEFmatrix[i][0]= (int )(Math.random() * 10 + 4);
-							DEFmatrix[i][1]= 1;
-						}
-					}
-					if(this.Plateau.territories[target-1].horseman[0] > 0) {
-						if(DEFmatrix[i][0] != 0) {
-							this.Plateau.territories[target-1].horseman[0]--;
-							DEFmatrix[i][0]= (int )(Math.random() * 8 + 2);
-							DEFmatrix[i][1]= 3;
-						}
-					}
-				}
-				
-				//tri de la matrice d'ATK selon les atk plus puissantes ou priorités
-				int memory1;
-				int memory2;
-				int memory3;
-				for (int i = 0; i<2; i++) {
-					for (int j =0; j<2; j++) {
-						if(ATKmatrix[j][0]<ATKmatrix[j+1][0] || (ATKmatrix[j][0]==ATKmatrix[j+1][0] && ATKmatrix[j][1]<ATKmatrix[j+1][1])) { //swap
-							memory1 = ATKmatrix[j][0];
-							memory2 = ATKmatrix[j][1];
-							memory3 = ATKmatrix[j][2];
-							ATKmatrix[j][0] = ATKmatrix[j+1][0];
-							ATKmatrix[j][1] = ATKmatrix[j+1][1];
-							ATKmatrix[j][2] = ATKmatrix[j+1][2];
-							ATKmatrix[j+1][0] = memory1;
-							ATKmatrix[j+1][1] = memory2;
-							ATKmatrix[j+1][2] = memory3;
-						}
-					
-					}
-					
-				}
-				
-				//tri matrice defense
-				if(DEFmatrix[0][0]<DEFmatrix[1][0] || (DEFmatrix[0][0]==DEFmatrix[1][0] && DEFmatrix[0][1]<DEFmatrix[1][1] || DEFmatrix[1][1]!=3)) {
-					//si l'atk de 2 est supérieur à l'attaque de 1, swap
-					//si l'atk de 2 et 1 sont egales et que le code d'unite (pt de mvt max) de 2 est plus grand que le code d'unite de 1
-					//excepte si ce code est 3 (horseman), alors swap. Ceci donne toujours 2 - 1 - 3 (soldat - canon - cavalier)
-					memory1 = DEFmatrix[0][0];
-					memory2 = DEFmatrix[0][1];
-					DEFmatrix[0][0] = DEFmatrix[1][0];
-					DEFmatrix[0][1] = DEFmatrix[1][1];
-					DEFmatrix[1][0] = memory1;
-					DEFmatrix[1][1] = memory2;
-				}
-				
-				//if(DEFmatrix)	  
-				//continuer ici
-					  
-				 
-			}
-			
-					
-				    
-				     
-				  
-			
-			
+			return 0;
 		}
-		
 	
 	
 }

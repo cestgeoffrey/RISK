@@ -39,6 +39,9 @@ public class Territory {
 	public int getCanonnier() {
 		return this.canonnier[0]+this.canonnier[1];
 	}
+	public int troopsInTerritory() {
+		return this.getMusketman()+this.getCanonnier()+this.getHorseman();
+	}
 	
 	
 }
