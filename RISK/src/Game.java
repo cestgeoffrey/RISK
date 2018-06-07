@@ -127,6 +127,7 @@ public class Game {
 					this.Plateau.players[playingPlayer-1].reinforcements = this.calculateReinforcements(playingPlayer);
 					this.listenPhase1(playingPlayer);
 					this.superInstinct(playingPlayer);
+					this.resetMovement(playingPlayer);
 					/*double X1=0, X2=0, Y1=0, Y2=0;
 					int i = 0;
 					
@@ -334,7 +335,7 @@ public class Game {
 								this.Plateau.actualize(3, playingPlayer, i+1);
 								while(orderFeedback == 100) {
 									orderFeedback = this.listenIntel(playingPlayer, i+1) ;
-									System.out.println(orderFeedback);
+									//System.out.println(orderFeedback);
 								}
 							}
 						}
@@ -662,7 +663,21 @@ public class Game {
 		}
 	}
 	
-	
+	public void resetMovement(int player) {
+		for (int i =0; i<42; i++) {
+			if (this.Plateau.territories[i].player == player) {
+				this.Plateau.territories[i].musketman[0]=this.Plateau.territories[i].getMusketman();
+				this.Plateau.territories[i].musketman[1]=0;
+				this.Plateau.territories[i].musketman[2]=0;
+				this.Plateau.territories[i].horseman[0]=this.Plateau.territories[i].getHorseman();
+				this.Plateau.territories[i].horseman[1]=0;
+				this.Plateau.territories[i].horseman[2]=0;
+				this.Plateau.territories[i].horseman[3]=0;
+				this.Plateau.territories[i].canonnier[0]=this.Plateau.territories[i].getCanonnier();
+				this.Plateau.territories[i].canonnier[1]=0;
+			}
+		}
+	}
 	
 	
 	
@@ -772,7 +787,7 @@ public class Game {
 					
 					//parcourt la main du joueur et remplit une matrice facilement lisible par le programme (ATKmatrix)
 					for (int i = 0; i < 3; i++) {
-						for (int mus = 0; mus <1; mus++) {
+						for (int mus = 0; mus <2; mus++) {
 							if(ATKmatrix[i][0]==0) {
 								if(this.Plateau.players[player-1].musketman[mus]!=0) {
 									this.Plateau.players[player-1].musketman[mus]-=1;
@@ -782,7 +797,7 @@ public class Game {
 								}
 							}
 						}
-						for (int hor = 0; hor <2; hor++) {
+						for (int hor = 0; hor <3; hor++) {
 							if(ATKmatrix[i][0]==0) {
 								if(this.Plateau.players[player-1].horseman[hor]!=0) {
 									this.Plateau.players[player-1].horseman[hor]--;
@@ -794,7 +809,7 @@ public class Game {
 						}
 						if(ATKmatrix[i][0]==0) {
 							if(this.Plateau.players[player-1].canonnier!=0) {
-								this.Plateau.players[player].canonnier--;
+								this.Plateau.players[player-1].canonnier--;
 								ATKmatrix[i][0] = (int)(Math.random() * 9 + 4);
 								ATKmatrix[i][1] = 1;
 								ATKmatrix[i][2] = 0;
