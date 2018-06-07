@@ -314,7 +314,7 @@ public class Game {
 							if(Plateau.territories[i].player == playingPlayer) {
 								orderFeedback = 100;
 								while(orderFeedback == 100) {//tant que feedback est different de 100 (100 = recommencer), continuer d
-									
+									this.Plateau.actualize(4, playingPlayer, i+1);
 									orderFeedback = this.listenOrders(playingPlayer, i+1) ;
 									this.Plateau.actualize(4, playingPlayer, i+1);
 									if(orderFeedback <43 && orderFeedback >0) {
@@ -336,6 +336,11 @@ public class Game {
 								orderFeedback = 100;
 								while(orderFeedback == 100) {
 									orderFeedback = this.listenIntel(playingPlayer, i+1) ;
+									if (orderFeedback == 0) {
+										this.Plateau.actualize(0, playingPlayer, 0);
+									}else {
+										this.Plateau.actualize(3, playingPlayer, i+1);
+									}
 									//System.out.println(orderFeedback);
 								}
 							}
