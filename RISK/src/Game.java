@@ -120,14 +120,30 @@ public class Game {
 	public void launch(int PlayerCount, int ActivateAI){
 		
 		this.Plateau.initialize(PlayerCount, ActivateAI);
+		
+		for (int playingPlayer=1; playingPlayer <= 6; playingPlayer++) {
+			if (this.Plateau.players[playingPlayer-1].alive) {
+				this.Plateau.players[playingPlayer-1].reinforcements = this.calculateReinforcements(playingPlayer);
+				this.listenPhase1(playingPlayer);
+			}
+		}			
 		while (this.moreThan1Alive()){
-			
 			for (int playingPlayer=1; playingPlayer <= 6; playingPlayer++) {
 				if (this.Plateau.players[playingPlayer-1].alive) {
 					this.Plateau.players[playingPlayer-1].reinforcements = this.calculateReinforcements(playingPlayer);
 					this.listenPhase1(playingPlayer);
-					this.superInstinct(playingPlayer);
+					this.listenPhase2(playingPlayer);
 					this.resetMovement(playingPlayer);
+					this.moreThan1Alive();
+					if (this.winner()!=0) {
+						//PRINT WINNER
+						StdDraw.picture(1361.0/2, 675.0/2, "Menu/WIN.png");
+						this.victoryMessage(playingPlayer);
+						StdDraw.show();
+						break;
+					}
+					
+					
 					/*double X1=0, X2=0, Y1=0, Y2=0;
 					int i = 0;
 					
@@ -187,13 +203,72 @@ public class Game {
 	}
 	
 	public boolean moreThan1Alive() {
-		int x = this.Plateau.territories[0].player;
+		
+		for (int i = 0; i<6; i++) {
+			this.Plateau.players[i].alive=false;
+			for (int j=0; j<42; j++) {
+				if(this.Plateau.territories[j].player == i+1) {
+					this.Plateau.players[i].alive=true;
+				}
+			}
+		}
+		int count = 0;
+		for (int i = 0; i<6;i++) {
+			if(this.Plateau.players[i].alive) {
+				count += 1;
+			}
+		}
+		if (count>1) {
+			return true;
+		}
+		return false;
+		/*int x = this.Plateau.territories[0].player;
 		for (int i=1; i<42; i++) {
 			if(this.Plateau.territories[i].player != x) {
 				return true;
 			}
 		}
-		return false;
+		return false;*/
+		
+	}
+	
+	public void victoryMessage(int player){
+		double x = 530.0;
+		double y = 300.0;
+		if(player == 1) {
+			StdDraw.text(x, y, "Cyan wins !");
+		}
+		if(player == 2) {
+			StdDraw.text(x, y, "Black wins !");
+		}
+		if(player == 3) {
+			StdDraw.text(x, y, "White wins !");
+		}
+		if(player == 4) {
+			StdDraw.text(x, y, "Grey wins !");
+		}
+		if(player == 5) {
+			StdDraw.text(x, y, "Green wins !");
+		}
+		if(player == 6) {
+			StdDraw.text(x, y, "Beige wins !");
+		}
+		
+	}
+	
+	public int winner() {
+		int count = 0;
+		int player = 0;
+		for (int i = 0; i <6; i++) {
+			if(this.Plateau.players[i].alive == true) {
+				player = i+1;
+				count ++;
+			}
+		}
+		if(count==1) {
+			return player;
+		}
+		return 0;
 	}
 	
 	public int calculateReinforcements(int player) {
@@ -229,6 +304,10 @@ public class Game {
 			M= M + (int )(Math.random()*2); //50% de chance de gagner un regiment
 		}
 		
+		//System.out.println("recently captured = " + this.Plateau.players[player-1].recentlyCaptured);
+		
+		this.Plateau.players[player-1].recentlyCaptured = 0;
+		
 		return (T/3)+(N/2)+M; //retourne le nombre de renforts
 		
 	}
@@ -236,7 +315,7 @@ public class Game {
 	public void listenPhase1(int playingPlayer) {
 
 		
-		
+		this.Plateau.actualize(0, playingPlayer, 0);
 		boolean stillOnPanel = true;
 		boolean clickedInSea = true;
 		while(Plateau.players[playingPlayer-1].reinforcements != 0) {
@@ -304,7 +383,7 @@ public class Game {
 		
 	}
 	
-	public void superInstinct(int playingPlayer) {
+	public void listenPhase2(int playingPlayer) {
 		int orderFeedback = 100;
 		while (orderFeedback!=101) {
 			if (StdDraw.isMousePressed()) {
@@ -354,7 +433,7 @@ public class Game {
 	}
 	
 	
-	public void listenPhase2(int playingPlayer) {
+	/*public void listenPhase2(int playingPlayer) {
 		int orderFeedback = 100;// code 100 = continuer d'ecouter le panel de commande des ordres, code 1 - 42 = declencher un mouvement de troups vers 
 		//ce numero de territoire, code 0 = cesser d'ecouter le panel d'ordres, code 101 passer le tour du joueur
 		boolean clickedInSea = true;
@@ -402,7 +481,7 @@ public class Game {
 				}
 			}
 		}
-	}
+	}*/
 	
 	public int listenOrders( int player , int territory) {
 		StdDraw.pause(150);
@@ -923,7 +1002,8 @@ public class Game {
 					
 					if(ATKmatrix[0][0]+ATKmatrix[1][0]+ATKmatrix[1][0] != 0) {//si matrice d'atk n'est pas vide
 						if(this.Plateau.territories[target-1].troopsInTerritory() ==0) {//si le territoire target est sans defense
-							this.Plateau.territories[target-1].player = player;
+							this.Plateau.territories[target-1].player = player;//territoire appartient desormais à player
+							this.Plateau.players[player-1].recentlyCaptured++;
 							for (int i = 0; i<3; i++) {
 								if(ATKmatrix[i][1]==2) {//si l'unite dans cette colonne de la matrice est un musketman, mettre a 0 cette colonne et
 									//transferer le musketman vers la memoire d'unites du territoire cible (on lui retire un pt de mouvement neanmoins)
