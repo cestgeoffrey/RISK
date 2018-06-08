@@ -8,7 +8,6 @@ public class Board {
 	int y = 675;
 	
 	
-	
 	public void initialize(int PlayerCount, int ActivateAI) {
 		int x = 1361;
 		int y = 675;
@@ -17,26 +16,10 @@ public class Board {
 		StdDraw.setYscale(0, y);
 		StdDraw.picture(x/2,y/2,"Map/Map.png");
 		StdDraw.pause(200);
-		//territories[1]= new Territory(2,0,0,0,0,0,0);
-		//
-		/*double X;
-		double Y;
-		while (!StdDraw.isKeyPressed(32)) {
-			
-			if (StdDraw.isMousePressed()) {	
-				
-				X = StdDraw.mouseX();
-				Y = StdDraw.mouseY();
-				System.out.println(X + "," + Y + ",");
-				StdDraw.pause(100);//Pause car isMousePressed reste true pendant qq ms (de trop !)
-			}
-			
-		}*/
 		
 		this.instanceTerritories();
 		this.attributeTerritories(PlayerCount, ActivateAI);
 		this.instancePlayers(PlayerCount, ActivateAI);
-		this.actualize(4,1,1);
 
 	}
 	
@@ -127,16 +110,14 @@ public class Board {
 		territories[38].setGeoInfo(832.0,169.0,6);
 		territories[39].setGeoInfo(937.0,199.0,6);
 		territories[40].setGeoInfo(879.0,63.0,6);
-		territories[41].setGeoInfo(972.0,78.0,6);
-		
-		
+		territories[41].setGeoInfo(972.0,78.0,6);			
 	}
 	
 	public void attributeTerritories(int PlayerCount, int ActivateAI) {
 		int x;
 		int y;
 		int memory;
-		territories[40].player = 0;
+		territories[40].player = 0;//dans le cas ou on joue à 3 ou 4, les deux derniers territoires ne sont attribués à personne
 		territories[41].player = 0;
 		
 		//attribution équitable et ordonnée de territoires
@@ -161,11 +142,7 @@ public class Board {
 					territories[j].setMusketman(0,0,0);
 				}
 			}
-		}
-		/*for (int j= 0; j<42;j++){
-			System.out.println(territories[j].player);
-		}*/
-		
+		}		
 	}
 	
 	public void instancePlayers(int PlayerCount, int ActivateAI) {
@@ -192,26 +169,18 @@ public class Board {
 		}
 		
 		//melange
-		int x, y/*, memoryNumber*/;
+		int x, y;
 		boolean memoryAlive, memoryAI;
 		for (i=0; i<PlayerCount*4;i++) {
 			x= (int )(Math.random() * PlayerCount);
 			y= (int )(Math.random() * PlayerCount);
-			//memoryNumber = players[x].number;
 			memoryAlive = players[x].alive;
 			memoryAI = players[x].AI;
-			//players[x].number = players[y].number;
 			players[x].alive = players[y].alive;
 			players[x].AI = players[y].AI;
-			//players[y].number = memoryNumber;
 			players[y].alive = memoryAlive;
 			players[y].AI = memoryAI;
-		}
-		
-		for (i=0; i<PlayerCount;i++) {
-			//System.out.println(players[i].number + " " + players[i].AI+ " " + players[i].alive + " " + players[i].color[0] + " " + players[i].color[1] + " " + players[i].color[2]);
-		}
-		
+		}		
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,7 +194,6 @@ public class Board {
 		this.writeColoredCube(player);
 		this.writeInRangeTerritories(panel,player,territory);
 		StdDraw.show();
-
 	}
 	
 	
@@ -243,18 +211,14 @@ public class Board {
 				StdDraw.setPenRadius(0.015);
 				StdDraw.circle(territories[i].X, territories[i].Y, 22.5);
 				StdDraw.setPenColor(0, 0, 0);
-				StdDraw.text(territories[i].X, territories[i].Y-2, Integer.toString(this.powerEstimation(territories[i])));
-				
+				StdDraw.text(territories[i].X, territories[i].Y-2, Integer.toString(this.powerEstimation(territories[i])));				
 			}
 			else {
 				StdDraw.setPenColor(255, 255, 255);
 				StdDraw.filledCircle(territories[i].X, territories[i].Y, 20);
 				StdDraw.setPenColor(0, 0, 0);
-				StdDraw.text(territories[i].X, territories[i].Y-2, "0");
-				
-				
+				StdDraw.text(territories[i].X, territories[i].Y-2, "0");								
 			}
-			//StdDraw.show();
 		}
 		StdDraw.disableDoubleBuffering();
 	}
@@ -320,24 +284,8 @@ public class Board {
 			StdDraw.text(1208.0,292.0,Integer.toString(this.players[player-1].musketman[1]));
 			StdDraw.text(1208.0,220.0,Integer.toString(this.players[player-1].musketman[0]));
 			StdDraw.text(1304.0,292.0,Integer.toString(this.players[player-1].canonnier));
-			break;
-			
-		}
-		
-		/*StdDraw.show();
-		double X;
-		double Y;
-		while (!StdDraw.isKeyPressed(32)) {
-			
-			if (StdDraw.isMousePressed()) {	
-				
-				X = StdDraw.mouseX();
-				Y = StdDraw.mouseY();
-				System.out.println(X + "," + Y + ",");
-				StdDraw.pause(100);//Pause car isMousePressed reste true pendant qq ms (de trop !)
-			}
-			
-		}*/
+			break;			
+		}		
 	}
 	
 	public void writeColoredCube(int player) {
@@ -354,10 +302,18 @@ public class Board {
 			if(this.territories[territory-1].player == player) {
 				for (int i = 0; i<6 ; i++) {
 					if (this.territories[territory-1].adjacency[i]!=0) {
-						
-						StdDraw.circle(this.territories[this.territories[territory-1].adjacency[i]-1].X, this.territories[this.territories[territory-1].adjacency[i]-1].Y, 35);
+						if(this.players[player-1].troopsInHand()>3) {
+							if(this.territories[this.territories[territory-1].adjacency[i]-1].player == player) {
+								StdDraw.circle(this.territories[this.territories[territory-1].adjacency[i]-1].X, this.territories[this.territories[territory-1].adjacency[i]-1].Y, 35);
+							}
+						}else {
+							StdDraw.circle(this.territories[this.territories[territory-1].adjacency[i]-1].X, this.territories[this.territories[territory-1].adjacency[i]-1].Y, 35);
+						}						
 						//On cherche dans le tab d'adjacence les id des territoires adjacents au territoire courant,
 						//puis on cherche les pos X et Y de ces territoires pour dessiner les cercles
+						//si il est possible d'effectuer une attaque vers un territoire ennemi, (unités en main <= 3)
+						//soit il est possible d'effectuer un déplacement (unités en main > 3)
+						//les territoires sont entourés en fonction des possibilités du joueur
 					}
 				}
 			}	

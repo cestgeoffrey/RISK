@@ -10,7 +10,6 @@ public class Game {
 		StdDraw.setCanvasSize(x, y);
 		StdDraw.setXscale(0, x);
 		StdDraw.setYscale(0, y);
-
 	}
 	
 	
@@ -86,8 +85,7 @@ public class Game {
 					case 1: this.drawRectangle(265.0, 158.0, 543.0, 280.0);
 					break;
 					case 2: this.drawRectangle(759.0, 158.0, 1038.0, 281.0);
-					break;
-					
+					break;					
 				}
 				if (this.isBetween(487.0, 15.0, 805.0, 135.0 )) {
 					if (PlayerCount !=0 && ActivateAI != 0) {
@@ -97,13 +95,7 @@ public class Game {
 				}
 				StdDraw.pause(100);
 			}
-		}
-		
-		
-		
-		
-		
-		
+		}												
 	}
 	
 	
@@ -120,7 +112,8 @@ public class Game {
 	public void launch(int PlayerCount, int ActivateAI){
 		
 		this.Plateau.initialize(PlayerCount, ActivateAI);
-		
+		StdDraw.pause(150);
+		//premier tour de renforcement commun
 		for (int playingPlayer=1; playingPlayer <= 6; playingPlayer++) {
 			if (this.Plateau.players[playingPlayer-1].alive) {
 				this.Plateau.players[playingPlayer-1].reinforcements = this.calculateReinforcements(playingPlayer);
@@ -163,14 +156,12 @@ public class Game {
 							StdDraw.pause(150);//Pause car isMousePressed reste true pendant qq ms (de trop !)
 						}
 						//Récupérateur de hitbox V2
+						//nous avons utilisé cette fonction pour récupérer des coordonées de hitbox formatées dans la console
+						//fonctionne en synergie avec isBetween
 					}*/
-				}
-				
-					
-				
+				}													
 			}
 		}
-		// TODO Dire qui a gagne
 	}
 	
 	
@@ -202,6 +193,7 @@ public class Game {
 		StdDraw.rectangle((x1+x2)/2,(y1+y2)/2,(x2-x1)/2,(y2-y1)/2);
 	}
 	
+	//vérifie que il y ait plus d'un joueur en vie et met à jour le statut de chaque joueur (toujours en course ou hors-jeu)
 	public boolean moreThan1Alive() {
 		
 		for (int i = 0; i<6; i++) {
@@ -222,16 +214,9 @@ public class Game {
 			return true;
 		}
 		return false;
-		/*int x = this.Plateau.territories[0].player;
-		for (int i=1; i<42; i++) {
-			if(this.Plateau.territories[i].player != x) {
-				return true;
-			}
-		}
-		return false;*/
-		
 	}
 	
+	//imprime un message de victoire personnalisé en fonction de la couleur du joueur
 	public void victoryMessage(int player){
 		double x = 530.0;
 		double y = 300.0;
@@ -256,6 +241,7 @@ public class Game {
 		
 	}
 	
+	//retourne le gagnant du jeu, 0 sinon
 	public int winner() {
 		int count = 0;
 		int player = 0;
@@ -271,6 +257,7 @@ public class Game {
 		return 0;
 	}
 	
+	//calcule les renforts de ce tour pour le joueur et reset le nombre de territoires récemment conquis
 	public int calculateReinforcements(int player) {
 		int T = 0;//Territoires controles
 		int N = 0;//Nombre de territoires par regions controlees
@@ -303,17 +290,13 @@ public class Game {
 		for(int i = 0; i<this.Plateau.players[player-1].recentlyCaptured;i++) {
 			M= M + (int )(Math.random()*2); //50% de chance de gagner un regiment
 		}
-		
-		//System.out.println("recently captured = " + this.Plateau.players[player-1].recentlyCaptured);
-		
 		this.Plateau.players[player-1].recentlyCaptured = 0;
-		
 		return (T/3)+(N/2)+M; //retourne le nombre de renforts
 		
 	}
 	
+	//permet l'activation de la première phase de jeu, et gère les interactions homme machine
 	public void listenPhase1(int playingPlayer) {
-
 		
 		this.Plateau.actualize(0, playingPlayer, 0);
 		boolean stillOnPanel = true;
@@ -328,23 +311,18 @@ public class Game {
 							while(stillOnPanel) {
 								stillOnPanel = this.listenReinforcements(playingPlayer, i+1) ;
 								this.Plateau.actualize(2, playingPlayer, i+1);
-								
 								//Si le joueur n'a plus de renforts a attribuer, on lui fait quitter le panel de force
 								if(Plateau.players[playingPlayer-1].reinforcements == 0 && this.powerInHand(playingPlayer) == 0 ) {
 									stillOnPanel = false;
 								}
-								//System.out.println(stillOnPanel);
 							}
 							stillOnPanel = true;
 							this.abortRHand(playingPlayer);
-							//StdDraw.pause(150);
 						}else {
 							this.Plateau.actualize(1, playingPlayer, i+1);
 							StdDraw.pause(150);
 						}
-						clickedInSea = false;
-						//this.Plateau.actualize(panel, player, territory);
-						
+						clickedInSea = false;						
 					}
 				}
 				if (this.isBetween(1025.0, 0.0, 1364.0, 669.0)) {
@@ -355,32 +333,7 @@ public class Game {
 				}
 			}
 			this.clearHand(playingPlayer);
-		}
-		
-		
-		
-		
-		/*double X1=0, X2=0, Y1=0, Y2=0;
-		int i = 0;
-		
-		while (!StdDraw.isKeyPressed(32)) {
-			
-			if (StdDraw.isMousePressed()) {	
-				if(i == 0) {
-					i=1;
-					X1 = StdDraw.mouseX();
-					Y1 = StdDraw.mouseY();
-				}else {
-					X2 = StdDraw.mouseX();
-					Y2 = StdDraw.mouseY();
-					System.out.println(X1 +", "+Y1 +", "+X2 +", "+Y2);
-					i = 0;
-				}
-				StdDraw.pause(150);//Pause car isMousePressed reste true pendant qq ms (de trop !)
-			}
-			//Récupérateur de hitbox V2
-		}*/
-		
+		}	
 	}
 	
 	public void listenPhase2(int playingPlayer) {
@@ -392,26 +345,23 @@ public class Game {
 						if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
 							if(Plateau.territories[i].player == playingPlayer) {
 								orderFeedback = 100;
-								while(orderFeedback == 100) {//tant que feedback est different de 100 (100 = recommencer), continuer d
+								while(orderFeedback == 100) {//tant que feedback est different de 100 (100 = recommencer), continuer de boucler
 									this.Plateau.actualize(4, playingPlayer, i+1);
 									orderFeedback = this.listenOrders(playingPlayer, i+1) ;
 									this.Plateau.actualize(4, playingPlayer, i+1);
-									if(orderFeedback <43 && orderFeedback >0) {
+									if(orderFeedback <43 && orderFeedback >0) { // lancer un mouvement ou une attaque
 										this.move(playingPlayer, i+1, orderFeedback);
-										//System.out.println("NN CA RENTR PA MDR");
 										orderFeedback = 100;
 										this.Plateau.actualize(4, playingPlayer, i+1);
 									}
-									if(orderFeedback == 0) {//a clique dans la mer
+									if(orderFeedback == 0) {//a clique dans la mer, reset de la main du joueur
 										this.abortHand(playingPlayer, i+1);
 										this.Plateau.actualize(0, playingPlayer, 0);
-										//System.out.println(this.Plateau.territories[i].troopsInTerritory());
-										//this.Plateau.actualize(4, playingPlayer, i+1);
 									}
 								} //fin du while
 							}
-							else {
-								this.Plateau.actualize(3, playingPlayer, i+1);
+							else {//si le territoire n'appartient pas au joueur
+								this.Plateau.actualize(3, playingPlayer, i+1);//afficher des informations sur les troupes ennemies
 								orderFeedback = 100;
 								while(orderFeedback == 100) {
 									orderFeedback = this.listenIntel(playingPlayer, i+1) ;
@@ -420,93 +370,23 @@ public class Game {
 									}else {
 										this.Plateau.actualize(3, playingPlayer, i+1);
 									}
-									//System.out.println(orderFeedback);
 								}
 							}
 						}
 					}	
 				}
-				//System.out.println("iiiiiiiiiiiiiiiii");
 			}
-			//System.out.println("OHOHOH");
 		}
 	}
 	
 	
-	/*public void listenPhase2(int playingPlayer) {
-		int orderFeedback = 100;// code 100 = continuer d'ecouter le panel de commande des ordres, code 1 - 42 = declencher un mouvement de troups vers 
-		//ce numero de territoire, code 0 = cesser d'ecouter le panel d'ordres, code 101 passer le tour du joueur
-		boolean clickedInSea = true;
-		boolean continu = true;//reste vrai tant que le joueur n'a pas passé son tour
-		while(orderFeedback != 101) {
-			if(StdDraw.isMousePressed()) {
-				clickedInSea = true;
-				for (int i = 0; i<42 ; i++) {
-					if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
-						if(Plateau.territories[i].player == playingPlayer) {
-							this.Plateau.actualize(4, playingPlayer, i+1);
-							while(orderFeedback == 100) {
-								orderFeedback = this.listenOrders(playingPlayer, i+1) ;
-								this.Plateau.actualize(4, playingPlayer, i+1);
-								if(orderFeedback <43 && orderFeedback >0) {
-									this.move(playingPlayer, i+1, orderFeedback);
-									orderFeedback = 100;
-									clickedInSea = false;
-								}
-								if(orderFeedback == 0) {//a clique dans la mer
-									this.abortHand(playingPlayer, i+1);
-									clickedInSea = true;
-
-								}
-								//Si le joueur n'a plus de renforts a attribuer, on lui fait quitter le panel de force
-								//System.out.println(stillOnPanel);
-							}
-				
-						}else {
-							this.Plateau.actualize(3, playingPlayer, i+1);
-							//clickedInSea == false;
-							
-							StdDraw.pause(150);
-						}
-						clickedInSea = false;
-						//this.Plateau.actualize(panel, player, territory);
-						
-					}
-				}
-				if (this.isBetween(1025.0, 0.0, 1364.0, 669.0)) {
-					clickedInSea = false;
-				}
-				if(clickedInSea) {
-					this.Plateau.actualize(0, playingPlayer, 0);
-				}
-			}
-		}
-	}*/
 	
+	//permet d'activer des hitbox spécifiques pour effectuer des opérations sur un territoire en particulier
+	//activation des hitbow pour le panel des ordres de mouvement et d'attaque
 	public int listenOrders( int player , int territory) {
 		StdDraw.pause(150);
 		while(true) {
 			if (StdDraw.isMousePressed()) {
-				if(this.isBetween(1062.0, 451.0, 1117.0, 507.0)) {
-					//this.addInRHand(player, 3);
-				}
-				if(this.isBetween(1161.0, 450.0, 1217.0, 506.0)) {
-					//this.addInRHand(player, 2);
-				}			
-				if(this.isBetween(1260.0, 452.0, 1316.0, 506.0)) {
-					//this.addInRHand(player, 1);
-				}
-				if(this.isBetween(1065.0, 378.0, 1120.0, 432.0)) {
-					//this.addInRHand(player, 3);
-				}
-				if(this.isBetween(1164.0, 378.0, 1216.0, 434.0)) {
-					//this.addInRHand(player, 2);
-				}
-				if(this.isBetween(1262.0, 378.0, 1317.0, 432.0)) {
-					//this.addInRHand(player, 1);
-				}
-				
-				//PREMIERE PARTIE ^
 				
 				if(this.isBetween(1063.0, 311.0, 1083.0, 335.0)) {
 					this.substractHand(player, 3, 2, territory);
@@ -527,7 +407,7 @@ public class Game {
 					this.addHand(player, 1, 0, territory);
 				}
 				
-				//1 PT MVT ^
+				//1 PT MVT ^           (opération sur les unités ayant encore 1 pt de mouvement restant)
 				
 				if(this.isBetween(1063.0, 237.0, 1091.0, 263.0)) {
 					this.substractHand(player, 3, 1, territory);
@@ -557,7 +437,7 @@ public class Game {
 					return 101; //Le joueur choisit de terminer son tour, indique à la supermethode de stopper l'ecoute de la phase 2
 				}
 				
-				//PASSE ^
+				//PASSE LE TOUR ^
 				
 				for (int i = 0; i<42 ; i++) {
 					if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
@@ -568,26 +448,18 @@ public class Game {
 						}
 						return i+1; // retourne l'id du territoire recepteur d'une attaque ou d'un mouvement de troupes
 					}
-				}
-				
-				
+				}								
 				if(this.isBetween(1025.0, 0.0, 1364.0, 669.0)) {
 					return 100; //est toujours sur panel ou a clique sur mm territoire, indique à la supermethode de l'appeler a nouveau
 				}
 				else {
-					//System.out.println((Plateau.territories[territory].X-28) + ",  " +(Plateau.territories[territory].Y-28) +", " + (Plateau.territories[territory].X+28) + ", " +  (Plateau.territories[territory].Y+28));
-					//System.out.println(StdDraw.mouseX() + " , " + StdDraw.mouseY());
 					return 0;//indique a la supermethode de cesser le while
 				}
-			}
-			
-				
-			
-			
-			
+			}																
 		}
 	}
 	
+	//permet en particulier d'écouter le bouton de passage de tour qui se trouve sur le panel d'infos sur les ennemis
 	public int listenIntel( int player , int territory) {
 		StdDraw.pause(150);
 		while(true) {
@@ -601,35 +473,17 @@ public class Game {
 				
 				//PASSE ^
 				
-				/*for (int i = 0; i<42 ; i++) {
-					if(this.isBetween(Plateau.territories[i].X-28, Plateau.territories[i].Y-28,Plateau.territories[i].X+28 , Plateau.territories[i].Y+28)) {
-						if(i+1 == territory) {
-							return 100; //le joueur a juste reclicke sur son territoire, on garde le panel intact
-						}else {
-							
-						}
-						return i+1; // retourne l'id du territoire recepteur d'une attaque ou d'un mouvement de troupes
-					}
-				}*/
-				
-				
 				if(this.isBetween(1025.0, 0.0, 1364.0, 669.0)) {
 					return 100; //est toujours sur panel ou a clique sur mm territoire, indique à la supermethode de l'appeler a nouveau
 				}
 				else {
-					//System.out.println((Plateau.territories[territory].X-28) + ",  " +(Plateau.territories[territory].Y-28) +", " + (Plateau.territories[territory].X+28) + ", " +  (Plateau.territories[territory].Y+28));
-					//System.out.println(StdDraw.mouseX() + " , " + StdDraw.mouseY());
 					return 0;//indique a la supermethode de cesser le while
 				}
-			}
-			
-				
-			
-			
-			
+			}			
 		}
 	}
 	
+	//permet d'ajouter des unités facilement dans la main d'un joueur sans avoir à se soucier de son nb de troupes totales
 	public void addHand(int player, int unit, int mvt, int territory) {
 		//mvt = points de mouvements deja consommes par l'unite
 		//territory = territoire de départ de l'unite
@@ -689,6 +543,7 @@ public class Game {
 		this.Plateau.players[player-1].horseman[2] = 0;
 	}
 	
+	//reset la main du joueur et réattribue les unités en main là ou elles ont été prises
 	public void abortHand(int player, int territory) {
 		this.Plateau.territories[territory-1].canonnier[0] += this.Plateau.players[player-1].canonnier;
 		this.Plateau.territories[territory-1].musketman[0] += this.Plateau.players[player-1].musketman[0];
@@ -701,9 +556,8 @@ public class Game {
 	
 	
 	
-	
+	//permet d'activer les hitbox pour un territoire en particulier vis à vis de l'attribution des renforts
 	public boolean listenReinforcements( int player , int territory) {
-		System.out.println("AH");
 		StdDraw.pause(150);
 		while(true) {
 			if (StdDraw.isMousePressed()) {
@@ -735,19 +589,15 @@ public class Game {
 					return true; //est toujours sur panel ou a clique sur mm territoire, indique à la supermethode de l'appeler a nouveau
 				}
 				else {
-					//System.out.println((Plateau.territories[territory].X-28) + ",  " +(Plateau.territories[territory].Y-28) +", " + (Plateau.territories[territory].X+28) + ", " +  (Plateau.territories[territory].Y+28));
-					//System.out.println(StdDraw.mouseX() + " , " + StdDraw.mouseY());
 					return false;
 				}
-			}
-			
-				
-			
-			
-			
+			}																
 		}
 	}
 	
+	//permet de reset les points de mouvements de chaque unité des territoires d'un joueur
+	//utilisé à la fin du tour d'un joueur (permet aussi une synergie avec la fonction bataille, qui n'opère que sur des défenseurs
+	//dont les pts de mouvements sont a 0
 	public void resetMovement(int player) {
 		for (int i =0; i<42; i++) {
 			if (this.Plateau.territories[i].player == player) {
@@ -812,65 +662,42 @@ public class Game {
 			this.Plateau.players[player-1].canonnier = 0;
 		}
 	
-	//Board Plateau = new Board();
-	//Plateau.initialize();
-	//Plateau.actualize();
 		public int move(int player, int territory, int target ) {
 			
-			
-			
-			
-			
-			//int DEFmusketman = this.Plateau.territories[target-1].getMusketman();
-			//int ATKhorseman = this.Plateau.players[player-1].horseman[0]+this.Plateau.players[player-1].horseman[1]+this.Plateau.players[player-1].horseman[2];
-			//int DEFhorseman = this.Plateau.territories[target-1].getHorseman();
-			//int[] ATK = new int[3];
-			//int[] DEF = new int[3];
-			//ATK[0]= ATKhorseman;
-			//ATK[1]= ATKmusketman;
-			//ATK[2]= ATKcanonnier;
-			//DEF[0]= DEFmusketman;
-			//DEF[1]= DEFcanonnier;
-			//DEF[2]= DEFhorseman;
-			//int attackerCode = 0;
-			//int defenserCode = 0;
-			//boolean dududuel = false;
-			//deplacement vers allie
+
 			boolean isAdjacent = false;
 			for (int i = 0; i <6; i++) {
 				if (this.Plateau.territories[territory-1].adjacency[i]==target) {
 					isAdjacent = true;
 				}
 			}
-			if(isAdjacent) {
-			
-			
-				//System.out.println("atk" + ATKmatrix[0][1] + " " + ATKmatrix[1][1] + " " + ATKmatrix[2][1]);
-				
-				if(this.Plateau.territories[territory-1].player==this.Plateau.territories[target-1].player){
+			if(isAdjacent) {//si les deux territoires sont adjacents				
+				if(this.Plateau.territories[territory-1].player==this.Plateau.territories[target-1].player){//deplacement vers allie
 					    this.Plateau.territories[target-1].horseman[1]+=this.Plateau.players[player-1].horseman[0];
 					    this.Plateau.territories[target-1].horseman[2]+=this.Plateau.players[player-1].horseman[1];
 					    this.Plateau.territories[target-1].horseman[3]+=this.Plateau.players[player-1].horseman[2];
 					    this.Plateau.territories[target-1].musketman[1]+=this.Plateau.players[player-1].musketman[0];
 					    this.Plateau.territories[target-1].musketman[2]+=this.Plateau.players[player-1].musketman[1];
 					    this.Plateau.territories[target-1].canonnier[1]+=this.Plateau.players[player-1].canonnier;
-					    //System.out.println(this.Plateau.players[player-1].musketman[0]);
-					    //System.out.println(this.Plateau.players[player-1].musketman[1]);
 					    this.clearHand(player);
 					    
 					    return 0;
 				}
 				else if(this.Plateau.players[player-1].troopsInHand() <= 3 && this.Plateau.players[player-1].troopsInHand() != 0) {
-					//System.out.println("override");
 					int[][]ATKmatrix = {{0,0,0},{0,0,0},{0,0,0}}; //premiere colonne: pts d'ATK, 2nd : priorité defensive, 3e : pts de mvt deja utilises
 					int[][]DEFmatrix = {{0,0},{0,0}}; //ATK et priorite
-					int ATKcanonnier = this.Plateau.players[player-1].canonnier;
-					int DEFcanonnier = this.Plateau.territories[target-1].getCanonnier();
-					int ATKmusketman = this.Plateau.players[player-1].musketman[0]+this.Plateau.players[player-1].musketman[1];
+					
+					//parcourt la main du joueur et remplit une matrice facilement lisible par le programme (ATKmatrix)					   										
+					//(0)(0)(0) <- pts d'atk tirés au sort
+					//(0)(0)(0) <- type de l'unité (désignée par son nombre de pts de mouvement max)
+					//(0)(0)(0) <- points de mouvements deja utilisés par l'unite
+					// ^          Première unité de la main du joueur (qui deviendra après tri l'unité la plus puissante ou prioritaire)
+					//    ^       Snd unité 
+					//       ^    3e unité
+					//on formatte les données puis on les trie pour les traiter facilement, on utilise le même principe avec la matrice de defense
 					
 					
-					
-					//parcourt la main du joueur et remplit une matrice facilement lisible par le programme (ATKmatrix)
+					//on crée la matrice d'atk
 					for (int i = 0; i < 3; i++) {
 						for (int mus = 0; mus <2; mus++) {
 							if(ATKmatrix[i][0]==0) {
@@ -903,7 +730,6 @@ public class Game {
 						
 						
 					}
-					System.out.println(ATKmatrix[0][0] + " " + ATKmatrix[1][0] + " " + ATKmatrix[2][0]);
 					
 					//defense matrix
 					for (int i = 0; i < 2 ; i++) {
@@ -929,7 +755,6 @@ public class Game {
 							}
 						}
 					}
-					System.out.println(DEFmatrix[0][0]+ " " + DEFmatrix[1][0]);
 					
 					//tri de la matrice d'ATK selon les atk plus puissantes ou priorités
 					int memory1;
@@ -947,10 +772,8 @@ public class Game {
 								ATKmatrix[j+1][0] = memory1;
 								ATKmatrix[j+1][1] = memory2;
 								ATKmatrix[j+1][2] = memory3;
-							}
-						
-						}
-						
+							}						
+						}						
 					}
 					
 					//tri matrice defense
@@ -966,22 +789,24 @@ public class Game {
 						DEFmatrix[1][1] = memory2;
 					}
 					
+					
+					//"combat" des matrices, le 1er affronte le premier, le second affronte le second et la ligne perdante est mise à 0
+				    //ce qui aura pour effet plus tard de supprimer l'unité
 					for (int i=0; i<2; i++) {
 						if(DEFmatrix[i][0] >= ATKmatrix[i][0]) {
-							//System.out.println("OH");
 							ATKmatrix[i][0]=0;
 							ATKmatrix[i][1]=0;
 							ATKmatrix[i][2]=0;
 						}else {
-							//System.out.println("OH");
 							DEFmatrix[i][0]=0;
 							DEFmatrix[i][1]=0;
 						}
 					}
-					//System.out.println(ATKmatrix[0][0] + " " + ATKmatrix[1][0] + " " + ATKmatrix[2][0]);
-					//System.out.println(DEFmatrix[0][0]+ " " + DEFmatrix[1][0]);
+					
 					
 					//rapatriement matrice de defense dans territoire target
+					//on utilise les données formattées pour ajouter un nombre d'unité à nos réserves ce qui a en réalité pour effet
+					//de restituer les unités victorieuses
 					for (int i=0; i<2; i++) {
 						if(DEFmatrix[i][1]==2) {//si unit = 2, rapatrier un musketman
 							this.Plateau.territories[target-1].musketman[0]++;
@@ -1000,8 +825,10 @@ public class Game {
 						}
 					}
 					
+					
+					
 					if(ATKmatrix[0][0]+ATKmatrix[1][0]+ATKmatrix[1][0] != 0) {//si matrice d'atk n'est pas vide
-						if(this.Plateau.territories[target-1].troopsInTerritory() ==0) {//si le territoire target est sans defense
+						if(this.Plateau.territories[target-1].troopsInTerritory() ==0) {//si le territoire target est sans defense (puisqu'on a déja rapatrié les défenseurs)
 							this.Plateau.territories[target-1].player = player;//territoire appartient desormais à player
 							this.Plateau.players[player-1].recentlyCaptured++;
 							for (int i = 0; i<3; i++) {
@@ -1010,8 +837,7 @@ public class Game {
 									this.Plateau.territories[target-1].musketman[ATKmatrix[i][2]+1]++;
 									ATKmatrix[i][0]=0;
 									ATKmatrix[i][1]=0;
-									ATKmatrix[i][2]=0;
-									
+									ATKmatrix[i][2]=0;									
 								}
 								if(ATKmatrix[i][1]==1) {
 									this.Plateau.territories[target-1].canonnier[ATKmatrix[i][2]+1]++;
@@ -1028,6 +854,7 @@ public class Game {
 								
 							}
 						}else {
+							//sinon, si le territoire ne peut pas encore nous appartenir
 							//rapatrier unites vers territoire de depart sans leur faire perdre de pt de mouvement 
 							for (int i = 0; i<3; i++) {
 								if(ATKmatrix[i][1]==2) {
@@ -1048,26 +875,12 @@ public class Game {
 									ATKmatrix[i][0]=0;
 									ATKmatrix[i][1]=0;
 									ATKmatrix[i][2]=0;
-								}
-								
+								}								
 							}
 						}
-					}
-							  
-					
-						  
-					 
-				} ///ici
-					
-							
-						    
-						     
-						  
-					
-					
+					}							  											  					 
+				}																		    						     						  										
 				}
 			return 0;
-		}
-	
-	
+		}		
 }

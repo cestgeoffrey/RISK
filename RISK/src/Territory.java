@@ -10,7 +10,7 @@ public class Territory {
 	double Y;
 	int region;
 	
-	public Territory(int ID, /*int[] adjacency*/int a,int b,int c,int d,int e,int f) {
+	public Territory(int ID, int a,int b,int c,int d,int e,int f) {
 		this.ID = ID;
         this.adjacency[0]=a;
         this.adjacency[1]=b;

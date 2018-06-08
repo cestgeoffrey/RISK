@@ -9,7 +9,8 @@ public class Player {
 	//2 panel de renfort de son territoire
 	//3 panel de visualisation des unitees ennemies lors de la phase de combat
 	//4 panel d'ordres
-	int[] musketman = {0,0};
+	int[] musketman = {0,0};//musketman[0] contient le nombre de musketman ayant dépensé 0 points de mouvements. similaire à ce que l'on trouve
+	//dans la classe Territory
 	int[] horseman =  {0,0,0};
 	int canonnier = 0;
 	int[] color= new int[3];
