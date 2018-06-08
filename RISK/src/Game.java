@@ -114,9 +114,9 @@ public class Game {
 		this.Plateau.initialize(PlayerCount, ActivateAI);
 		StdDraw.pause(150);
 		//premier tour de renforcement commun
+		this.firstTurnReinforcements();
 		for (int playingPlayer=1; playingPlayer <= 6; playingPlayer++) {
 			if (this.Plateau.players[playingPlayer-1].alive) {
-				this.Plateau.players[playingPlayer-1].reinforcements = this.calculateReinforcements(playingPlayer);
 				this.listenPhase1(playingPlayer);
 			}
 		}			
@@ -255,6 +255,32 @@ public class Game {
 			return player;
 		}
 		return 0;
+	}
+	
+	public void firstTurnReinforcements() {
+		int count = 0;
+		for (int i = 0; i<6 ;  i++) {
+			if (this.Plateau.players[i].alive == true) {
+				count++;
+			}
+		}
+		for (int i = 0; i<6 ; i++) {
+			if(count==2) {
+				this.Plateau.players[i].reinforcements=40;
+			}
+			if(count==3) {
+				this.Plateau.players[i].reinforcements=35;
+			}
+			if(count==4) {
+				this.Plateau.players[i].reinforcements=30;
+			}
+			if(count==5) {
+				this.Plateau.players[i].reinforcements=25;
+			}
+			if(count==6) {
+				this.Plateau.players[i].reinforcements=20;
+			}
+		}
 	}
 	
 	//calcule les renforts de ce tour pour le joueur et reset le nombre de territoires récemment conquis
